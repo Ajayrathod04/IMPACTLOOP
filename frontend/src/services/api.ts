@@ -16,9 +16,9 @@ async function safeFetch(path: string, options?: RequestInit): Promise<Response>
   try {
     const res = await fetch(`${API_BASE}${path}`, options);
     if (res.ok) return res;
-    return await fetch(`http://localhost:8000${path}`, options);
+    return await fetch(path, options);
   } catch {
-    return await fetch(`http://localhost:8000${path}`, options);
+    return await fetch(path, options);
   }
 }
 
