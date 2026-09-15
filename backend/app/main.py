@@ -34,9 +34,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Register API routes
+# Register API routes (both /api prefix and root prefix for serverless rewrites)
 app.include_router(health_router, prefix="/api")
+app.include_router(health_router)
 app.include_router(changes_router, prefix="/api")
+app.include_router(changes_router)
 
 
 @app.get("/")
