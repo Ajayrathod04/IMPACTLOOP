@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-surface-bg: #07090e;
+    --color-card-bg: #0d111a;
+    --color-border-subtle: rgba(255, 255, 255, 0.07);
+  }
+
+  body {
+    background-color: var(--color-surface-bg);
+    color: #e6e4dc;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    overflow-x: hidden;
+  }
+}
+
+/* Technical grid & radial glow utilities */
+.bg-tech-grid {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+}
+
+.bg-radial-glow {
+  background: radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.08) 0%, rgba(7, 9, 14, 0) 70%);
+}
+
+.bg-radial-amber {
+  background: radial-gradient(circle at 20% 20%, rgba(245, 158, 11, 0.12) 0%, transparent 60%);
+}
+
+/* Technical 1px borders & micro-highlights */
+.border-tech {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.border-tech-amber {
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #080a0f;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1c2230;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2d364a;
+}
+
+/* Pulse signal indicator */
+@keyframes pulse-signal {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(1.15);
+  }
+}
+
+.animate-signal {
+  animation: pulse-signal 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* React Flow Custom Node & Edge Styles */
+.react-flow__node {
+  border-radius: 8px !important;
+  font-family: 'JetBrains Mono', monospace !important;
+}
+
+.react-flow__edge-path {
+  stroke-dasharray: 6 3;
+  animation: edge-flow 25s linear infinite;
+}
+
+@keyframes edge-flow {
+  from {
+    stroke-dashoffset: 200;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}

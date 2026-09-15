@@ -1,0 +1,26 @@
+[
+  {
+    "id": "CHG-2026-089",
+    "title": "Free Trial: 14 days → 7 days",
+    "description": "Shorten self-serve trial period to accelerate high-intent user conversion, increase sales team outreach velocity, and optimize pipeline throughput.",
+    "category": "Pricing & Packaging",
+    "riskLevel": "high",
+    "status": "analyzing",
+    "affectedAreaCount": 4,
+    "unknownCount": 3,
+    "recommendedActionCount": 4,
+    "affectedAreas": ["Conversion", "Onboarding", "Sales", "Billing"]
+  },
+  {
+    "id": "CHG-2026-090",
+    "title": "Migrate v1 REST API authentication to OAuth 2.0 PKCE",
+    "description": "Deprecate legacy API keys in favor of scoped OAuth 2.0 tokens for improved enterprise security compliance.",
+    "category": "API Infrastructure",
+    "riskLevel": "critical",
+    "status": "draft",
+    "affectedAreaCount": 6,
+    "unknownCount": 5,
+    "recommendedActionCount": 6,
+    "affectedAreas": ["SDKs", "Integrations", "Webhooks", "Developer Portal", "Auth Service", "Billing Logs"]
+  }
+]

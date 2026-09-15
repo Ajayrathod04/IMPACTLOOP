@@ -1,0 +1,1 @@
+"""ImpactLoop Domain Models Package."""
