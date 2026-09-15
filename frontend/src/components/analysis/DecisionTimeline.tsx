@@ -1,7 +1,15 @@
-import React from 'react';
-import { ChangeStatus } from '../../types';
-import { cn } from '../../lib/utils';
-import { Clock, Activity, CheckCircle2, Send, Eye, Brain, ChevronRight } from 'lucide-react';
+import React from "react";
+import { ChangeStatus } from "../../types";
+import { cn } from "../../lib/utils";
+import {
+  Clock,
+  Activity,
+  CheckCircle2,
+  Send,
+  Eye,
+  Brain,
+  ChevronRight,
+} from "lucide-react";
 
 export interface DecisionTimelineProps {
   currentStatus: ChangeStatus;
@@ -12,14 +20,15 @@ export const DecisionTimeline: React.FC<DecisionTimelineProps> = ({
   currentStatus,
   onStageClick,
 }) => {
-  const stages: { id: ChangeStatus; label: string; icon: React.ElementType }[] = [
-    { id: 'draft', label: 'PROPOSED', icon: Clock },
-    { id: 'analyzing', label: 'ANALYZING', icon: Activity },
-    { id: 'approved', label: 'DECISION', icon: CheckCircle2 },
-    { id: 'shipped', label: 'SHIPPED', icon: Send },
-    { id: 'observing', label: 'OBSERVED', icon: Eye },
-    { id: 'learned', label: 'LEARNED', icon: Brain },
-  ];
+  const stages: { id: ChangeStatus; label: string; icon: React.ElementType }[] =
+    [
+      { id: "draft", label: "PROPOSED", icon: Clock },
+      { id: "analyzing", label: "ANALYZING", icon: Activity },
+      { id: "approved", label: "DECISION", icon: CheckCircle2 },
+      { id: "shipped", label: "SHIPPED", icon: Send },
+      { id: "observing", label: "OBSERVED", icon: Eye },
+      { id: "learned", label: "LEARNED", icon: Brain },
+    ];
 
   const currentIdx = stages.findIndex((s) => s.id === currentStatus);
   const activeIndex = currentIdx >= 0 ? currentIdx : 1; // Default to ANALYZING
@@ -32,7 +41,10 @@ export const DecisionTimeline: React.FC<DecisionTimelineProps> = ({
           DECISION LIFECYCLE PIPELINE
         </span>
         <span className="text-[11px] font-mono text-slate-400">
-          Current State: <strong className="text-amber-400 uppercase tracking-wider">{stages[activeIndex].label}</strong>
+          Current State:{" "}
+          <strong className="text-amber-400 uppercase tracking-wider">
+            {stages[activeIndex].label}
+          </strong>
         </span>
       </div>
 
@@ -48,18 +60,22 @@ export const DecisionTimeline: React.FC<DecisionTimelineProps> = ({
               <button
                 onClick={() => onStageClick?.(stage.id)}
                 className={cn(
-                  'flex items-center gap-2 px-3 py-2 rounded-lg border text-xs font-mono transition-all cursor-pointer shrink-0 relative',
+                  "flex items-center gap-2 px-3 py-2 rounded-lg border text-xs font-mono transition-all cursor-pointer shrink-0 relative",
                   isCurrent
-                    ? 'bg-amber-950/70 border-amber-500/80 text-amber-300 font-semibold shadow-md shadow-amber-950/50'
+                    ? "bg-amber-950/70 border-amber-500/80 text-amber-300 font-semibold shadow-md shadow-amber-950/50"
                     : isPassed
-                    ? 'bg-[#0e121a] border-slate-800 text-slate-300 hover:border-slate-700'
-                    : 'bg-[#080a0f] border-slate-900 text-slate-500 hover:text-slate-400 hover:border-slate-800'
+                      ? "bg-[#0e121a] border-slate-800 text-slate-300 hover:border-slate-700"
+                      : "bg-[#080a0f] border-slate-900 text-slate-500 hover:text-slate-400 hover:border-slate-800",
                 )}
               >
                 <Icon
                   className={cn(
-                    'w-3.5 h-3.5',
-                    isCurrent ? 'text-amber-400 animate-pulse' : isPassed ? 'text-emerald-400' : 'text-slate-500'
+                    "w-3.5 h-3.5",
+                    isCurrent
+                      ? "text-amber-400 animate-pulse"
+                      : isPassed
+                        ? "text-emerald-400"
+                        : "text-slate-500",
                   )}
                 />
                 <span className="tracking-tight">{stage.label}</span>
@@ -70,7 +86,14 @@ export const DecisionTimeline: React.FC<DecisionTimelineProps> = ({
                 )}
               </button>
               {idx < stages.length - 1 && (
-                <ChevronRight className={cn('w-3.5 h-3.5 shrink-0', idx < activeIndex ? 'text-emerald-500/60' : 'text-slate-800')} />
+                <ChevronRight
+                  className={cn(
+                    "w-3.5 h-3.5 shrink-0",
+                    idx < activeIndex
+                      ? "text-emerald-500/60"
+                      : "text-slate-800",
+                  )}
+                />
               )}
             </React.Fragment>
           );

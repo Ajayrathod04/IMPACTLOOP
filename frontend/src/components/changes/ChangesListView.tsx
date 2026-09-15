@@ -1,8 +1,14 @@
-import React, { useState } from 'react';
-import { Search, ArrowUpDown, GitPullRequest, Sparkles, User } from 'lucide-react';
-import { Badge } from '../ui/Badge';
-import { Button } from '../ui/Button';
-import { Change } from '../../types';
+import React, { useState } from "react";
+import {
+  Search,
+  ArrowUpDown,
+  GitPullRequest,
+  Sparkles,
+  User,
+} from "lucide-react";
+import { Badge } from "../ui/Badge";
+import { Button } from "../ui/Button";
+import { Change } from "../../types";
 
 export interface ChangesListViewProps {
   changes: Change[];
@@ -16,31 +22,35 @@ export const ChangesListView: React.FC<ChangesListViewProps> = ({
   onSelectChange,
   onNewAnalysisClick,
 }) => {
-  const [search, setSearch] = useState('');
-  const [riskFilter, setRiskFilter] = useState('all');
-  const [categoryFilter, setCategoryFilter] = useState('all');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [sortBy, setSortBy] = useState<'updated' | 'risk'>('updated');
+  const [search, setSearch] = useState("");
+  const [riskFilter, setRiskFilter] = useState("all");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [sortBy, setSortBy] = useState<"updated" | "risk">("updated");
 
   const filteredChanges = changes
     .filter((c) => {
       const matchesSearch =
         c.title.toLowerCase().includes(search.toLowerCase()) ||
-        (c.description && c.description.toLowerCase().includes(search.toLowerCase())) ||
+        (c.description &&
+          c.description.toLowerCase().includes(search.toLowerCase())) ||
         c.category.toLowerCase().includes(search.toLowerCase());
 
-      const matchesRisk = riskFilter === 'all' || c.risk_level === riskFilter;
-      const matchesCat = categoryFilter === 'all' || c.category === categoryFilter;
-      const matchesStatus = statusFilter === 'all' || c.status === statusFilter;
+      const matchesRisk = riskFilter === "all" || c.risk_level === riskFilter;
+      const matchesCat =
+        categoryFilter === "all" || c.category === categoryFilter;
+      const matchesStatus = statusFilter === "all" || c.status === statusFilter;
 
       return matchesSearch && matchesRisk && matchesCat && matchesStatus;
     })
     .sort((a, b) => {
-      if (sortBy === 'risk') {
+      if (sortBy === "risk") {
         const order = { critical: 4, high: 3, medium: 2, low: 1 };
         return order[b.risk_level] - order[a.risk_level];
       }
-      return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+      return (
+        new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+      );
     });
 
   return (
@@ -56,11 +66,17 @@ export const ChangesListView: React.FC<ChangesListViewProps> = ({
             Change Evaluations Registry ({changes.length})
           </h2>
           <p className="text-xs text-slate-400 font-mono mt-1">
-            Operational registry of proposed product and engineering changes. Select any row to inspect decision intelligence.
+            Operational registry of proposed product and engineering changes.
+            Select any row to inspect decision intelligence.
           </p>
         </div>
 
-        <Button variant="primary" size="sm" icon={<Sparkles className="w-4 h-4" />} onClick={onNewAnalysisClick}>
+        <Button
+          variant="primary"
+          size="sm"
+          icon={<Sparkles className="w-4 h-4" />}
+          onClick={onNewAnalysisClick}
+        >
           ANALYZE A CHANGE
         </Button>
       </div>
@@ -121,11 +137,11 @@ export const ChangesListView: React.FC<ChangesListViewProps> = ({
 
           {/* Sort By Filter */}
           <button
-            onClick={() => setSortBy(sortBy === 'updated' ? 'risk' : 'updated')}
+            onClick={() => setSortBy(sortBy === "updated" ? "risk" : "updated")}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#07090e] border border-slate-800 text-xs font-mono text-slate-300 hover:text-white transition-colors cursor-pointer"
           >
             <ArrowUpDown className="w-3.5 h-3.5 text-amber-400" />
-            Sort: {sortBy === 'updated' ? 'Recently Updated' : 'Highest Risk'}
+            Sort: {sortBy === "updated" ? "Recently Updated" : "Highest Risk"}
           </button>
         </div>
       </div>
@@ -156,11 +172,15 @@ export const ChangesListView: React.FC<ChangesListViewProps> = ({
                     <td className="p-4">
                       <div className="space-y-0.5 font-sans">
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-ivory-100">{change.title}</span>
+                          <span className="font-bold text-ivory-100">
+                            {change.title}
+                          </span>
                           {change.is_demo && <Badge type="demo" size="sm" />}
                         </div>
                         {change.description && (
-                          <p className="text-[11px] text-slate-400 line-clamp-1 max-w-xs">{change.description}</p>
+                          <p className="text-[11px] text-slate-400 line-clamp-1 max-w-xs">
+                            {change.description}
+                          </p>
                         )}
                       </div>
                     </td>
@@ -168,12 +188,16 @@ export const ChangesListView: React.FC<ChangesListViewProps> = ({
                     <td className="p-4 text-slate-300">
                       <div className="flex items-center gap-1">
                         <User className="w-3 h-3 text-slate-500" />
-                        <span>{change.owner || 'Product Growth'}</span>
+                        <span>{change.owner || "Product Growth"}</span>
                       </div>
                     </td>
 
                     <td className="p-4">
-                      <Badge type="risk" riskLevel={change.risk_level} size="sm" />
+                      <Badge
+                        type="risk"
+                        riskLevel={change.risk_level}
+                        size="sm"
+                      />
                     </td>
 
                     <td className="p-4 text-slate-300">
@@ -181,7 +205,9 @@ export const ChangesListView: React.FC<ChangesListViewProps> = ({
                     </td>
 
                     <td className="p-4 text-emerald-400 font-bold">
-                      {change.analysis_result ? `${Math.round(change.analysis_result.confidence_score * 100)}%` : '78%'}
+                      {change.analysis_result
+                        ? `${Math.round(change.analysis_result.confidence_score * 100)}%`
+                        : "78%"}
                     </td>
 
                     <td className="p-4">
@@ -189,13 +215,19 @@ export const ChangesListView: React.FC<ChangesListViewProps> = ({
                     </td>
 
                     <td className="p-4 text-right text-slate-400 text-[11px]">
-                      {new Date(change.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      {new Date(change.updated_at).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                      })}
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={7} className="p-8 text-center text-slate-500 font-mono text-xs">
+                  <td
+                    colSpan={7}
+                    className="p-8 text-center text-slate-500 font-mono text-xs"
+                  >
                     No matching changes found in registry.
                   </td>
                 </tr>

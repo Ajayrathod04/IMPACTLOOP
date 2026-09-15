@@ -119,6 +119,116 @@ class ChangeRepository:
         self._store[change_id] = change
         return change
 
+    def analyze(self, change_id: str, preferred_provider: Optional[str] = None) -> Optional[Change]:
+        """Run impact analysis engine on a change and update repository record."""
+        change = self.get_by_id(change_id)
+        if not change:
+            return None
+
+        # Build request model for service
+        req = CreateChangeRequest(
+            title=change.title,
+            description=change.description,
+            category=change.category,
+            intended_outcome=change.intended_outcome,
+            current_state=change.current_state,
+            proposed_state=change.proposed_state,
+            owner=change.owner,
+        )
+
+        # Run analysis via LocalAnalysisEngine
+        analysis = LocalAnalysisEngine.analyze(req, change_id)
+
+        # Update change record
+        change.status = ChangeStatus.ANALYZING
+        change.risk_level = analysis.risk_level
+        change.affected_area_count = len(analysis.affected_areas)
+        change.unknown_count = len(analysis.assumptions_unknowns)
+        change.recommended_action_count = len(analysis.recommended_actions)
+        change.affected_areas = analysis.affected_areas
+        change.analysis_result = analysis
+        change.updated_at = datetime.now(timezone.utc)
+
+        self._store[change_id] = change
+        return change
+
+    def record_decision(
+        self,
+        change_id: str,
+        decision: DecisionType,
+        reason: str,
+        reviewer: str = "Lead Architect",
+        unresolved_risks: List[str] = None,
+        selected_guardrails: List[str] = None,
+    ) -> Optional[Change]:
+        """Record human decision gate result on a change."""
+        change = self.get_by_id(change_id)
+        if not change:
+            return None
+
+        human_dec = DecisionGateService.record_decision(
+            change_id=change_id,
+            decision=decision,
+            reason=reason,
+            reviewer=reviewer,
+            unresolved_risks=unresolved_risks,
+            selected_guardrails=selected_guardrails,
+        )
+
+        change.human_decision = human_dec
+        if decision == DecisionType.APPROVE:
+            change.status = ChangeStatus.APPROVED
+        elif decision == DecisionType.HOLD:
+            change.status = ChangeStatus.DRAFT
+
+        change.updated_at = datetime.now(timezone.utc)
+        self._store[change_id] = change
+        return change
+
+    def record_outcome(
+        self,
+        change_id: str,
+        metric: str,
+        predicted_direction: str,
+        observed_direction: str,
+        predicted_value: Optional[str] = None,
+        observed_value: Optional[str] = None,
+        observation_window: str = "14 days post-ship",
+        notes: Optional[str] = None,
+    ) -> Optional[Change]:
+        """Record post-shipment telemetry observation and compute learning loop delta."""
+        change = self.get_by_id(change_id)
+        if not change:
+            return None
+
+        obs = ObservationService.record_observation(
+            change_id=change_id,
+            metric=metric,
+            predicted_direction=predicted_direction,
+            observed_direction=observed_direction,
+            predicted_value=predicted_value,
+            observed_value=observed_value,
+            observation_window=observation_window,
+            notes=notes,
+        )
+
+        learn = LearningLoopService.compute_learning(
+            change_id=change_id,
+            observation=obs,
+            analysis_result=change.analysis_result,
+        )
+
+        # Update organizational memory
+        org_memory_service.add_from_learning(learn)
+
+        change.observation = obs
+        change.learning_record = learn
+        change.status = ChangeStatus.LEARNED
+        change.updated_at = datetime.now(timezone.utc)
+
+        self._store[change_id] = change
+        return change
+
 
 # Singleton repository instance for FastAPI lifecycle
 db_store = ChangeRepository()

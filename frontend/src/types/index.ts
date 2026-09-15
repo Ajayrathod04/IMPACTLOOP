@@ -2,17 +2,22 @@
  * ImpactLoop Core Domain Types & Interfaces - Step 3 Impact Observatory
  */
 
-export type RiskLevel = 'low' | 'medium' | 'high' | 'critical';
+export type RiskLevel = "low" | "medium" | "high" | "critical";
 
 export type ChangeStatus =
-  | 'draft'
-  | 'analyzing'
-  | 'approved'
-  | 'shipped'
-  | 'observing'
-  | 'learned';
+  | "draft"
+  | "analyzing"
+  | "approved"
+  | "shipped"
+  | "observing"
+  | "learned";
 
-export type NodeTypeCategory = 'known' | 'assumed' | 'unknown' | 'high_risk' | 'observed';
+export type NodeTypeCategory =
+  | "known"
+  | "assumed"
+  | "unknown"
+  | "high_risk"
+  | "observed";
 
 export interface ImpactNode {
   id: string;
@@ -53,8 +58,8 @@ export interface Action {
   change_id: string;
   title: string;
   owner?: string;
-  status: 'pending' | 'in_progress' | 'completed';
-  priority: 'low' | 'medium' | 'high' | 'urgent';
+  status: "pending" | "in_progress" | "completed";
+  priority: "low" | "medium" | "high" | "urgent";
 }
 
 export interface Scenario {
@@ -138,7 +143,7 @@ export interface RiskStoryStep {
   label: string;
   title: string;
   description: string;
-  iconType: 'change' | 'downstream' | 'impact' | 'guardrail';
+  iconType: "change" | "downstream" | "impact" | "guardrail";
 }
 
 export interface OrgMemoryItem {
@@ -156,7 +161,7 @@ export interface OrgMemoryItem {
 
 export interface ToastMessage {
   id: string;
-  type: 'success' | 'info' | 'warning' | 'error';
+  type: "success" | "info" | "warning" | "error";
   title: string;
   description?: string;
 }

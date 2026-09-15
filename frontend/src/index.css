@@ -12,7 +12,11 @@
   body {
     background-color: var(--color-surface-bg);
     color: #e6e4dc;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family:
+      "Inter",
+      system-ui,
+      -apple-system,
+      sans-serif;
     overflow-x: hidden;
   }
 }
@@ -20,17 +24,25 @@
 /* Technical grid & radial glow utilities */
 .bg-tech-grid {
   background-size: 32px 32px;
-  background-image: 
+  background-image:
     linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
 }
 
 .bg-radial-glow {
-  background: radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.08) 0%, rgba(7, 9, 14, 0) 70%);
+  background: radial-gradient(
+    circle at 50% 0%,
+    rgba(245, 158, 11, 0.08) 0%,
+    rgba(7, 9, 14, 0) 70%
+  );
 }
 
 .bg-radial-amber {
-  background: radial-gradient(circle at 20% 20%, rgba(245, 158, 11, 0.12) 0%, transparent 60%);
+  background: radial-gradient(
+    circle at 20% 20%,
+    rgba(245, 158, 11, 0.12) 0%,
+    transparent 60%
+  );
 }
 
 /* Technical 1px borders & micro-highlights */
@@ -63,7 +75,8 @@
 
 /* Pulse signal indicator */
 @keyframes pulse-signal {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
     transform: scale(1);
   }
@@ -80,7 +93,7 @@
 /* React Flow Custom Node & Edge Styles */
 .react-flow__node {
   border-radius: 8px !important;
-  font-family: 'JetBrains Mono', monospace !important;
+  font-family: "JetBrains Mono", monospace !important;
 }
 
 .react-flow__edge-path {

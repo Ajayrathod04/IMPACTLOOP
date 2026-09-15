@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Activity,
   GitPullRequest,
@@ -7,8 +7,8 @@ import {
   Brain,
   Settings,
   Zap,
-} from 'lucide-react';
-import { cn } from '../../lib/utils';
+} from "lucide-react";
+import { cn } from "../../lib/utils";
 
 export interface SidebarProps {
   activeTab: string;
@@ -16,13 +16,17 @@ export interface SidebarProps {
   apiConnected?: boolean;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, apiConnected = true }) => {
+export const Sidebar: React.FC<SidebarProps> = ({
+  activeTab,
+  onTabChange,
+  apiConnected = true,
+}) => {
   const navItems = [
-    { id: 'overview', label: 'Decision Room', icon: Activity },
-    { id: 'changes', label: 'Changes', icon: GitPullRequest },
-    { id: 'scenarios', label: 'Scenarios', icon: Sliders },
-    { id: 'outcomes', label: 'Outcomes', icon: CheckCircle2 },
-    { id: 'org_memory', label: 'Org Memory', icon: Brain },
+    { id: "overview", label: "Decision Room", icon: Activity },
+    { id: "changes", label: "Changes", icon: GitPullRequest },
+    { id: "scenarios", label: "Scenarios", icon: Sliders },
+    { id: "outcomes", label: "Outcomes", icon: CheckCircle2 },
+    { id: "org_memory", label: "Org Memory", icon: Brain },
   ];
 
   return (
@@ -57,15 +61,24 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, apiCon
                 onClick={() => onTabChange(item.id)}
                 title={item.label}
                 className={cn(
-                  'w-full flex items-center justify-between px-4 py-2.5 text-xs font-mono transition-all cursor-pointer group',
+                  "w-full flex items-center justify-between px-4 py-2.5 text-xs font-mono transition-all cursor-pointer group",
                   isActive
-                    ? 'border-l-2 border-amber-400 bg-amber-950/30 text-amber-300 font-semibold'
-                    : 'border-l-2 border-transparent text-slate-400 hover:text-ivory-100 hover:bg-slate-900/40'
+                    ? "border-l-2 border-amber-400 bg-amber-950/30 text-amber-300 font-semibold"
+                    : "border-l-2 border-transparent text-slate-400 hover:text-ivory-100 hover:bg-slate-900/40",
                 )}
               >
                 <div className="flex items-center gap-3">
-                  <Icon className={cn('w-4 h-4 shrink-0 transition-colors', isActive ? 'text-amber-400' : 'text-slate-500 group-hover:text-slate-300')} />
-                  <span className="hidden md:inline tracking-tight">{item.label}</span>
+                  <Icon
+                    className={cn(
+                      "w-4 h-4 shrink-0 transition-colors",
+                      isActive
+                        ? "text-amber-400"
+                        : "text-slate-500 group-hover:text-slate-300",
+                    )}
+                  />
+                  <span className="hidden md:inline tracking-tight">
+                    {item.label}
+                  </span>
                 </div>
                 {isActive && (
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-signal hidden md:inline-block" />
@@ -80,12 +93,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, apiCon
       <div className="space-y-3 px-3">
         {/* Settings button */}
         <button
-          onClick={() => onTabChange('settings')}
+          onClick={() => onTabChange("settings")}
           className={cn(
-            'w-full flex items-center gap-3 px-3 py-2 rounded text-xs font-mono transition-colors cursor-pointer',
-            activeTab === 'settings'
-              ? 'text-amber-300 bg-slate-900 border border-slate-800'
-              : 'text-slate-500 hover:text-slate-300 hover:bg-slate-900/30'
+            "w-full flex items-center gap-3 px-3 py-2 rounded text-xs font-mono transition-colors cursor-pointer",
+            activeTab === "settings"
+              ? "text-amber-300 bg-slate-900 border border-slate-800"
+              : "text-slate-500 hover:text-slate-300 hover:bg-slate-900/30",
           )}
         >
           <Settings className="w-4 h-4 text-slate-500" />
@@ -100,7 +113,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, apiCon
             <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider">
               ENGINE STATUS
             </span>
-            <span className={`w-2 h-2 rounded-full ${apiConnected ? 'bg-emerald-400 animate-pulse' : 'bg-rose-500'}`} />
+            <span
+              className={`w-2 h-2 rounded-full ${apiConnected ? "bg-emerald-400 animate-pulse" : "bg-rose-500"}`}
+            />
           </div>
           <p className="text-[10px] font-mono text-slate-400 mt-1">
             ● LOCAL ENGINE
@@ -109,8 +124,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, apiCon
             Deterministic analysis
           </p>
           <div className="mt-1.5 text-[10px] font-mono">
-            <span className={apiConnected ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
-              API {apiConnected ? 'ONLINE (HTTP 200)' : 'OFFLINE'}
+            <span
+              className={
+                apiConnected
+                  ? "text-emerald-400 font-bold"
+                  : "text-rose-400 font-bold"
+              }
+            >
+              API {apiConnected ? "ONLINE (HTTP 200)" : "OFFLINE"}
             </span>
           </div>
         </div>

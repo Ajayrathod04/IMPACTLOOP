@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   AlertTriangle,
   GitBranch,
@@ -8,10 +8,10 @@ import {
   Target,
   Brain,
   X,
-} from 'lucide-react';
-import { Badge } from '../ui/Badge';
-import { Button } from '../ui/Button';
-import { Change } from '../../types';
+} from "lucide-react";
+import { Badge } from "../ui/Badge";
+import { Button } from "../ui/Button";
+import { Change } from "../../types";
 
 export interface AnalysisDetailViewProps {
   change: Change;
@@ -31,21 +31,33 @@ export const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({
         <div className="p-6 border-b border-slate-800/80 bg-slate-950/80 flex items-start justify-between gap-4">
           <div className="space-y-1.5">
             <div className="flex items-center gap-2 flex-wrap">
-              {change.is_demo ? <Badge type="demo" /> : <Badge type="status" status={change.status} />}
+              {change.is_demo ? (
+                <Badge type="demo" />
+              ) : (
+                <Badge type="status" status={change.status} />
+              )}
               <Badge type="risk" riskLevel={change.risk_level} />
               <span className="text-xs font-mono text-amber-300 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-800/50">
                 {change.category}
               </span>
-              <span className="text-xs font-mono text-slate-500">ID: {change.id}</span>
+              <span className="text-xs font-mono text-slate-500">
+                ID: {change.id}
+              </span>
             </div>
-            <h2 className="text-xl font-bold text-ivory-100 tracking-tight">{change.title}</h2>
+            <h2 className="text-xl font-bold text-ivory-100 tracking-tight">
+              {change.title}
+            </h2>
             {change.description && (
-              <p className="text-xs text-slate-300 max-w-3xl leading-relaxed">{change.description}</p>
+              <p className="text-xs text-slate-300 max-w-3xl leading-relaxed">
+                {change.description}
+              </p>
             )}
             {change.intended_outcome && (
               <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-slate-950 border border-slate-800 text-xs text-slate-300">
                 <Target className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                <span className="font-semibold text-slate-400">Intended Goal:</span>
+                <span className="font-semibold text-slate-400">
+                  Intended Goal:
+                </span>
                 <span>{change.intended_outcome}</span>
               </div>
             )}
@@ -70,7 +82,9 @@ export const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({
                     <span className="text-2xl font-black text-rose-400 font-mono">
                       {analysis.risk_score}
                     </span>
-                    <span className="block text-[9px] font-mono text-slate-400 uppercase">/ 100 Risk</span>
+                    <span className="block text-[9px] font-mono text-slate-400 uppercase">
+                      / 100 Risk
+                    </span>
                   </div>
                 </div>
 
@@ -80,7 +94,8 @@ export const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({
                       Deterministic Consequence Score
                     </span>
                     <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-amber-950 text-amber-300 border border-amber-800/50">
-                      {Math.round(analysis.confidence_score * 100)}% Model Confidence
+                      {Math.round(analysis.confidence_score * 100)}% Model
+                      Confidence
                     </span>
                   </div>
                   <p className="text-xs text-slate-300 leading-relaxed max-w-xl">
@@ -121,7 +136,8 @@ export const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({
             <div className="space-y-3">
               <h3 className="text-xs font-mono font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2">
                 <ShieldAlert className="w-4 h-4 text-rose-400" />
-                Predicted Downstream Consequences ({analysis.downstream_impacts.length})
+                Predicted Downstream Consequences (
+                {analysis.downstream_impacts.length})
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {analysis.downstream_impacts.map((node) => (
@@ -130,12 +146,16 @@ export const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({
                     className="bg-slate-950/80 border border-slate-800/90 rounded-xl p-4 space-y-2 relative overflow-hidden"
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-xs font-bold text-ivory-100">{node.name}</span>
+                      <span className="text-xs font-bold text-ivory-100">
+                        {node.name}
+                      </span>
                       <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-900 text-amber-300 border border-slate-800">
                         Hop Depth {node.depth}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-300 leading-relaxed">{node.details}</p>
+                    <p className="text-xs text-slate-300 leading-relaxed">
+                      {node.details}
+                    </p>
                     <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-900 font-mono">
                       <span>Domain: {node.domain_type}</span>
                       <span className="text-emerald-400">
@@ -153,11 +173,15 @@ export const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({
             <div className="space-y-3">
               <h3 className="text-xs font-mono font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2">
                 <HelpCircle className="w-4 h-4 text-amber-400" />
-                Surfaced Assumptions & Unknowns ({analysis.assumptions_unknowns.length})
+                Surfaced Assumptions & Unknowns (
+                {analysis.assumptions_unknowns.length})
               </h3>
               <div className="bg-amber-950/20 border border-amber-900/40 rounded-xl p-4 space-y-2">
                 {analysis.assumptions_unknowns.map((item, idx) => (
-                  <div key={idx} className="flex items-start gap-2.5 text-xs text-amber-200/90">
+                  <div
+                    key={idx}
+                    className="flex items-start gap-2.5 text-xs text-amber-200/90"
+                  >
                     <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
                     <span>{item}</span>
                   </div>
@@ -171,7 +195,8 @@ export const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({
             <div className="space-y-3">
               <h3 className="text-xs font-mono font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2">
                 <CheckSquare className="w-4 h-4 text-emerald-400" />
-                Recommended Actionable Guardrails ({analysis.recommended_actions.length})
+                Recommended Actionable Guardrails (
+                {analysis.recommended_actions.length})
               </h3>
               <div className="space-y-2">
                 {analysis.recommended_actions.map((act) => (
@@ -184,10 +209,13 @@ export const AnalysisDetailView: React.FC<AnalysisDetailViewProps> = ({
                         <CheckSquare className="w-4 h-4" />
                       </div>
                       <div>
-                        <p className="text-xs font-semibold text-ivory-100">{act.title}</p>
+                        <p className="text-xs font-semibold text-ivory-100">
+                          {act.title}
+                        </p>
                         {act.owner && (
                           <p className="text-[11px] text-slate-400 font-mono mt-0.5">
-                            Assigned: <span className="text-amber-300">{act.owner}</span>
+                            Assigned:{" "}
+                            <span className="text-amber-300">{act.owner}</span>
                           </p>
                         )}
                       </div>

@@ -1,15 +1,22 @@
+<<<<<<< HEAD
+
+# IMPACTLOOP
+
+=======
+
 # ImpactLoop ⚡
 
 > **AI Change-Impact SaaS Platform for SaaS, Product & Engineering Teams.**  
-> *Understand what your next change could break before it does.*
+> _Understand what your next change could break before it does._
 
 ---
 
 ## 🎯 The Problem
 
-Product and engineering teams in modern SaaS companies ship changes continuously—adjusting pricing tiers, modifying trial durations, updating API contracts, or refactoring core workflows. 
+Product and engineering teams in modern SaaS companies ship changes continuously—adjusting pricing tiers, modifying trial durations, updating API contracts, or refactoring core workflows.
 
 However, every change introduces hidden downstream risks:
+
 - Shortening a trial might boost sales urgency but spike onboarding drop-offs.
 - Deprecating an API field might unblock infra cleanup but break 3rd-party integrations.
 - Teams lack visibility into multi-hop consequences until production metrics crash.
@@ -35,6 +42,7 @@ PREDICT ──> PROVE ──> SHIP ──> OBSERVE ──> LEARN
 ## 🏗️ Architecture & Technology Stack
 
 ### Frontend (`/frontend`)
+
 - **Framework**: React 18 + Vite + TypeScript
 - **Styling**: Tailwind CSS (Dark SaaS Design System)
 - **Graph Visualizer**: React Flow (`@xyflow/react`)
@@ -42,6 +50,7 @@ PREDICT ──> PROVE ──> SHIP ──> OBSERVE ──> LEARN
 - **Utilities**: `clsx`, `tailwind-merge`
 
 ### Backend (`/backend`)
+
 - **Runtime**: Python 3.12+ (managed with `uv`)
 - **API Framework**: FastAPI + Uvicorn
 - **Data Validation**: Pydantic v2
@@ -66,10 +75,12 @@ PREDICT ──> PROVE ──> SHIP ──> OBSERVE ──> LEARN
 ## 🚀 Local Setup & Quickstart
 
 ### Prerequisites
+
 - Node.js (v18+) & npm
 - Python (3.12+) & `uv` (or standard `pip`)
 
 ### 1. Run Backend Server
+
 ```bash
 cd backend
 python -m pip install -e .[dev]
@@ -78,18 +89,21 @@ python -m pip install -e .[dev]
 # Start FastAPI server
 python -m uvicorn app.main:app --reload --port 8000
 ```
+
 - API Endpoint: `http://localhost:8000`
 - Swagger Docs: `http://localhost:8000/docs`
 - Health Check: `http://localhost:8000/api/health`
 
 #### Run Backend Tests
+
 ```bash
 python -m pytest backend/tests
 ```
 
 ---
 
-## 2. Run Frontend Application
+### 2. Run Frontend Application
+
 ```bash
 cd frontend
 npm install
@@ -97,9 +111,11 @@ npm install
 # Start Vite dev server
 npm run dev
 ```
+
 - Local URL: `http://localhost:5173`
 
 #### Build Frontend
+
 ```bash
 cd frontend
 npm run build
@@ -120,3 +136,5 @@ npm run build
 ## 📜 License
 
 This project is licensed under the [MIT License](LICENSE).
+
+> > > > > > > 51c38fa (feat: complete ImpactLoop Decision Intelligence Control Room transformation)

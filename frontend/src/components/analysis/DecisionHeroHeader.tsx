@@ -1,6 +1,6 @@
-import React from 'react';
-import { Sparkles, Play } from 'lucide-react';
-import { Button } from '../ui/Button';
+import React from "react";
+import { Sparkles, Play } from "lucide-react";
+import { Button } from "../ui/Button";
 
 export interface DecisionHeroHeaderProps {
   onAnalyzeClick: () => void;
@@ -16,7 +16,7 @@ export const DecisionHeroHeader: React.FC<DecisionHeroHeaderProps> = ({
       {/* Subtle radial light ambient background */}
       <div className="absolute top-0 right-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute -bottom-10 -left-10 w-72 h-72 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none" />
-      
+
       <div className="relative z-10 max-w-4xl space-y-4">
         {/* Micro Category Tag */}
         <div className="flex items-center gap-2">
@@ -28,13 +28,17 @@ export const DecisionHeroHeader: React.FC<DecisionHeroHeaderProps> = ({
 
         {/* Editorial Headline */}
         <h1 className="text-2xl md:text-4xl font-extrabold tracking-tight text-ivory-100 font-sans leading-tight">
-          &ldquo;Understand what your next change <br className="hidden sm:inline" />
-          <span className="text-amber-400 font-mono">could break</span> before it does.&rdquo;
+          &ldquo;Understand what your next change{" "}
+          <br className="hidden sm:inline" />
+          <span className="text-amber-400 font-mono">could break</span> before
+          it does.&rdquo;
         </h1>
 
         {/* Explanatory Context */}
         <p className="text-xs md:text-sm text-slate-300 max-w-2xl font-sans leading-relaxed">
-          ImpactLoop traces downstream consequences across your product, surfaces uncertainty before rollout, and learns from what actually happened.
+          ImpactLoop traces downstream consequences across your product,
+          surfaces uncertainty before rollout, and learns from what actually
+          happened.
         </p>
 
         {/* Action Controls */}

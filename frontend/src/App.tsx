@@ -1,50 +1,58 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
+import { Network, ShieldAlert, Sliders } from "lucide-react";
+import { Sidebar } from "./components/layout/Sidebar";
+import { Header } from "./components/layout/Header";
+import { Button } from "./components/ui/Button";
+import { ToastContainer } from "./components/ui/Toast";
+import { AnalyzeModal } from "./components/dashboard/AnalyzeModal";
+import { AnalysisDetailView } from "./components/dashboard/AnalysisDetailView";
+import { DecisionHeroHeader } from "./components/analysis/DecisionHeroHeader";
+import { ImpactNetworkGraph } from "./components/analysis/ImpactNetworkGraph";
+import { NodeDetailPanel } from "./components/analysis/NodeDetailPanel";
+import { RiskStorySection } from "./components/analysis/RiskStorySection";
+import { DecisionTimeline } from "./components/analysis/DecisionTimeline";
+import { UnknownsSection } from "./components/analysis/UnknownsSection";
+import { ChangeInvestigationHeader } from "./components/analysis/ChangeInvestigationHeader";
+import { ScenarioComparisonView } from "./components/scenarios/ScenarioComparisonView";
+import { LearningLoopView } from "./components/outcomes/LearningLoopView";
+import { OrgMemoryView } from "./components/memory/OrgMemoryView";
+import { ChangesListView } from "./components/changes/ChangesListView";
 import {
-  Network,
-  ShieldAlert,
-  Sliders,
-} from 'lucide-react';
-import { Sidebar } from './components/layout/Sidebar';
-import { Header } from './components/layout/Header';
-import { Button } from './components/ui/Button';
-import { ToastContainer } from './components/ui/Toast';
-import { AnalyzeModal } from './components/dashboard/AnalyzeModal';
-import { AnalysisDetailView } from './components/dashboard/AnalysisDetailView';
-import { DecisionHeroHeader } from './components/analysis/DecisionHeroHeader';
-import { ImpactNetworkGraph } from './components/analysis/ImpactNetworkGraph';
-import { NodeDetailPanel } from './components/analysis/NodeDetailPanel';
-import { RiskStorySection } from './components/analysis/RiskStorySection';
-import { DecisionTimeline } from './components/analysis/DecisionTimeline';
-import { UnknownsSection } from './components/analysis/UnknownsSection';
-import { ChangeInvestigationHeader } from './components/analysis/ChangeInvestigationHeader';
-import { ScenarioComparisonView } from './components/scenarios/ScenarioComparisonView';
-import { LearningLoopView } from './components/outcomes/LearningLoopView';
-import { OrgMemoryView } from './components/memory/OrgMemoryView';
-import { ChangesListView } from './components/changes/ChangesListView';
-import { Change, CreateChangePayload, ImpactNode, ToastMessage, ChangeStatus } from './types';
+  Change,
+  CreateChangePayload,
+  ImpactNode,
+  ToastMessage,
+  ChangeStatus,
+} from "./types";
 import {
   fetchHealth,
   fetchChanges,
   createChange,
   analyzeChange,
-} from './services/api';
+} from "./services/api";
 
 export const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState("overview");
   const [changes, setChanges] = useState<Change[]>([]);
   const [selectedChange, setSelectedChange] = useState<Change | null>(null);
-  const [selectedGraphNode, setSelectedGraphNode] = useState<ImpactNode | null>(null);
+  const [selectedGraphNode, setSelectedGraphNode] = useState<ImpactNode | null>(
+    null,
+  );
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showNetworkGraph, setShowNetworkGraph] = useState(true);
-  const [activeScenarioId, setActiveScenarioId] = useState<string>('expected');
+  const [activeScenarioId, setActiveScenarioId] = useState<string>("expected");
 
   const [apiConnected, setApiConnected] = useState(false);
 
   // Toast feedback notifications
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
-  const addToast = (type: ToastMessage['type'], title: string, description?: string) => {
+  const addToast = (
+    type: ToastMessage["type"],
+    title: string,
+    description?: string,
+  ) => {
     const id = `toast-${Date.now()}-${Math.random()}`;
     setToasts((prev) => [...prev, { id, type, title, description }]);
     setTimeout(() => {
@@ -62,9 +70,17 @@ export const App: React.FC = () => {
     setChanges(changeList);
 
     if (isConnected) {
-      addToast('success', 'FastAPI Engine Online', 'Connected via Vite API proxy (v0.2.0)');
+      addToast(
+        "success",
+        "FastAPI Engine Online",
+        "Connected via Vite API proxy (v0.2.0)",
+      );
     } else {
-      addToast('warning', 'Backend Offline Fallback', 'Running local demonstration fallback.');
+      addToast(
+        "warning",
+        "Backend Offline Fallback",
+        "Running local demonstration fallback.",
+      );
     }
   };
 
@@ -78,19 +94,26 @@ export const App: React.FC = () => {
       const newChange = await createChange(payload);
       const analyzedChange = await analyzeChange(newChange.id);
 
-      setChanges((prev) => [analyzedChange, ...prev.filter((c) => c.id !== analyzedChange.id)]);
+      setChanges((prev) => [
+        analyzedChange,
+        ...prev.filter((c) => c.id !== analyzedChange.id),
+      ]);
       setSelectedChange(analyzedChange);
       setShowNetworkGraph(true);
-      setActiveTab('overview');
+      setActiveTab("overview");
 
       addToast(
-        'success',
-        'Impact Analysis Complete',
-        `Evaluated '${analyzedChange.title}' with Risk Score ${analyzedChange.analysis_result?.risk_score}/100.`
+        "success",
+        "Impact Analysis Complete",
+        `Evaluated '${analyzedChange.title}' with Risk Score ${analyzedChange.analysis_result?.risk_score}/100.`,
       );
     } catch (error) {
-      console.error('Failed to submit and analyze change:', error);
-      addToast('error', 'Analysis Failed', 'Could not communicate with FastAPI analysis engine.');
+      console.error("Failed to submit and analyze change:", error);
+      addToast(
+        "error",
+        "Analysis Failed",
+        "Could not communicate with FastAPI analysis engine.",
+      );
     }
   };
 
@@ -100,10 +123,14 @@ export const App: React.FC = () => {
       const updated = await analyzeChange(changeId);
       setChanges((prev) => prev.map((c) => (c.id === changeId ? updated : c)));
       setSelectedChange(updated);
-      addToast('info', 'Re-Analysis Complete', `Updated consequence canvas for ${changeId}`);
+      addToast(
+        "info",
+        "Re-Analysis Complete",
+        `Updated consequence canvas for ${changeId}`,
+      );
     } catch (error) {
-      console.error('Failed to re-analyze change:', error);
-      addToast('error', 'Re-Analysis Failed');
+      console.error("Failed to re-analyze change:", error);
+      addToast("error", "Re-Analysis Failed");
     }
   };
 
@@ -112,29 +139,40 @@ export const App: React.FC = () => {
     if (demo) {
       setSelectedChange(demo);
       setShowNetworkGraph(true);
-      setActiveTab('overview');
-      addToast('info', 'Loaded Demo Scenario', `Focusing scenario: ${demo.title}`);
+      setActiveTab("overview");
+      addToast(
+        "info",
+        "Loaded Demo Scenario",
+        `Focusing scenario: ${demo.title}`,
+      );
     }
   };
 
   const activeDemoChange = changes.find((c) => c.is_demo) || changes[0];
-  const currentStatus: ChangeStatus = activeDemoChange?.status || 'analyzing';
+  const currentStatus: ChangeStatus = activeDemoChange?.status || "analyzing";
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-[#07090e] text-ivory-100 font-sans selection:bg-amber-500 selection:text-slate-950">
       {/* Left Navigation Compact Rail */}
-      <Sidebar activeTab={activeTab} onTabChange={setActiveTab} apiConnected={apiConnected} />
+      <Sidebar
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        apiConnected={apiConnected}
+      />
 
       {/* Main Observatory Area */}
       <div className="flex-1 flex flex-col h-full overflow-hidden">
         {/* Top Header Command Strip */}
-        <Header onAnalyzeClick={() => setIsModalOpen(true)} apiConnected={apiConnected} />
+        <Header
+          onAnalyzeClick={() => setIsModalOpen(true)}
+          apiConnected={apiConnected}
+        />
 
         {/* Main Content Body */}
         <div className="flex-1 flex overflow-hidden">
           <main className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
             {/* DECISION ROOM (OVERVIEW TAB) */}
-            {activeTab === 'overview' && (
+            {activeTab === "overview" && (
               <>
                 {/* 1. EDITORIAL DECISION HERO INTRO */}
                 <DecisionHeroHeader
@@ -169,10 +207,12 @@ export const App: React.FC = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        icon={<Network className="w-3.5 h-3.5 text-amber-400" />}
+                        icon={
+                          <Network className="w-3.5 h-3.5 text-amber-400" />
+                        }
                         onClick={() => setShowNetworkGraph(!showNetworkGraph)}
                       >
-                        {showNetworkGraph ? 'Hide Canvas' : 'Show Canvas'}
+                        {showNetworkGraph ? "Hide Canvas" : "Show Canvas"}
                       </Button>
                     </div>
                   </div>
@@ -180,7 +220,10 @@ export const App: React.FC = () => {
                   {/* React Flow Spatial System Map */}
                   {showNetworkGraph && (
                     <ImpactNetworkGraph
-                      changeTitle={activeDemoChange?.title || 'Free Trial: 14 days → 7 days'}
+                      changeTitle={
+                        activeDemoChange?.title ||
+                        "Free Trial: 14 days → 7 days"
+                      }
                       onNodeSelect={(node) => setSelectedGraphNode(node)}
                       selectedNodeId={selectedGraphNode?.id}
                       activeScenarioId={activeScenarioId}
@@ -192,12 +235,16 @@ export const App: React.FC = () => {
                 <RiskStorySection />
 
                 {/* 6. SURFACED UNKNOWNS & UNCERTAINTY MATRIX */}
-                <UnknownsSection unknowns={activeDemoChange?.analysis_result?.assumptions_unknowns} />
+                <UnknownsSection
+                  unknowns={
+                    activeDemoChange?.analysis_result?.assumptions_unknowns
+                  }
+                />
               </>
             )}
 
             {/* CHANGES TAB */}
-            {activeTab === 'changes' && (
+            {activeTab === "changes" && (
               <ChangesListView
                 changes={changes}
                 onSelectChange={(item) => setSelectedChange(item)}
@@ -207,28 +254,35 @@ export const App: React.FC = () => {
             )}
 
             {/* SCENARIOS TAB */}
-            {activeTab === 'scenarios' && (
+            {activeTab === "scenarios" && (
               <ScenarioComparisonView
                 onSelectScenario={(scId) => {
                   setActiveScenarioId(scId);
-                  addToast('info', 'Scenario Active', `Switched network emphasis to ${scId.toUpperCase()} scenario.`);
+                  addToast(
+                    "info",
+                    "Scenario Active",
+                    `Switched network emphasis to ${scId.toUpperCase()} scenario.`,
+                  );
                 }}
               />
             )}
 
             {/* OUTCOMES TAB */}
-            {activeTab === 'outcomes' && <LearningLoopView />}
+            {activeTab === "outcomes" && <LearningLoopView />}
 
             {/* ORG MEMORY TAB */}
-            {activeTab === 'org_memory' && <OrgMemoryView />}
+            {activeTab === "org_memory" && <OrgMemoryView />}
 
             {/* SETTINGS TAB */}
-            {activeTab === 'settings' && (
+            {activeTab === "settings" && (
               <div className="space-y-6 max-w-3xl">
                 <div className="bg-[#0b0e17] border border-slate-800/90 rounded-xl p-6 shadow-xl">
-                  <h2 className="text-xl font-bold text-ivory-100 font-sans">Observatory Configuration & Telemetry</h2>
+                  <h2 className="text-xl font-bold text-ivory-100 font-sans">
+                    Observatory Configuration & Telemetry
+                  </h2>
                   <p className="text-xs text-slate-400 mt-1 font-mono">
-                    Manage workspace environment, API endpoints, risk thresholds, and notification webhooks.
+                    Manage workspace environment, API endpoints, risk
+                    thresholds, and notification webhooks.
                   </p>
                 </div>
 
@@ -240,7 +294,9 @@ export const App: React.FC = () => {
 
                   <div className="space-y-3 text-xs">
                     <div>
-                      <label className="block text-slate-300 font-semibold mb-1">FastAPI Proxy Endpoint</label>
+                      <label className="block text-slate-300 font-semibold mb-1">
+                        FastAPI Proxy Endpoint
+                      </label>
                       <input
                         type="text"
                         readOnly
@@ -251,11 +307,17 @@ export const App: React.FC = () => {
 
                     <div className="flex items-center justify-between p-3 rounded bg-[#07090e] border border-slate-800 font-mono">
                       <div>
-                        <span className="font-semibold text-slate-200 block">FastAPI Telemetry Probe</span>
-                        <span className="text-slate-400 text-[11px]">GET /api/health monitoring</span>
+                        <span className="font-semibold text-slate-200 block">
+                          FastAPI Telemetry Probe
+                        </span>
+                        <span className="text-slate-400 text-[11px]">
+                          GET /api/health monitoring
+                        </span>
                       </div>
-                      <span className={`px-2.5 py-1 rounded text-xs font-mono font-bold ${apiConnected ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-rose-950 text-rose-300 border border-rose-800'}`}>
-                        API {apiConnected ? 'ONLINE (HTTP 200)' : 'OFFLINE'}
+                      <span
+                        className={`px-2.5 py-1 rounded text-xs font-mono font-bold ${apiConnected ? "bg-emerald-950 text-emerald-300 border border-emerald-800" : "bg-rose-950 text-rose-300 border border-rose-800"}`}
+                      >
+                        API {apiConnected ? "ONLINE (HTTP 200)" : "OFFLINE"}
                       </span>
                     </div>
                   </div>
@@ -268,12 +330,22 @@ export const App: React.FC = () => {
                   </h3>
                   <div className="space-y-2 text-xs text-slate-300 font-mono">
                     <div className="flex items-center justify-between p-3 rounded bg-[#07090e] border border-slate-800">
-                      <span>Require mandatory team review for risk scores &gt; 80/100</span>
-                      <span className="text-emerald-400 font-bold">Enabled</span>
+                      <span>
+                        Require mandatory team review for risk scores &gt;
+                        80/100
+                      </span>
+                      <span className="text-emerald-400 font-bold">
+                        Enabled
+                      </span>
                     </div>
                     <div className="flex items-center justify-between p-3 rounded bg-[#07090e] border border-slate-800">
-                      <span>Automated Slack alert on critical downstream node identification</span>
-                      <span className="text-emerald-400 font-bold">Enabled</span>
+                      <span>
+                        Automated Slack alert on critical downstream node
+                        identification
+                      </span>
+                      <span className="text-emerald-400 font-bold">
+                        Enabled
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -286,7 +358,9 @@ export const App: React.FC = () => {
             <NodeDetailPanel
               node={selectedGraphNode}
               onClose={() => setSelectedGraphNode(null)}
-              onGuardrailAdd={(guardrail) => addToast('success', 'Guardrail Added', guardrail)}
+              onGuardrailAdd={(guardrail) =>
+                addToast("success", "Guardrail Added", guardrail)
+              }
             />
           )}
         </div>
@@ -308,7 +382,10 @@ export const App: React.FC = () => {
       )}
 
       {/* Toast Notifications Container */}
-      <ToastContainer toasts={toasts} onDismiss={(id) => setToasts((prev) => prev.filter((t) => t.id !== id))} />
+      <ToastContainer
+        toasts={toasts}
+        onDismiss={(id) => setToasts((prev) => prev.filter((t) => t.id !== id))}
+      />
     </div>
   );
 };

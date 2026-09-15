@@ -1,13 +1,16 @@
-import React from 'react';
-import { Search, Bell, Layers, ChevronDown, Sparkles, Zap } from 'lucide-react';
-import { Button } from '../ui/Button';
+import React from "react";
+import { Search, Bell, Layers, ChevronDown, Sparkles, Zap } from "lucide-react";
+import { Button } from "../ui/Button";
 
 export interface HeaderProps {
   onAnalyzeClick?: () => void;
   apiConnected?: boolean;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onAnalyzeClick, apiConnected = true }) => {
+export const Header: React.FC<HeaderProps> = ({
+  onAnalyzeClick,
+  apiConnected = true,
+}) => {
   return (
     <header className="h-14 border-b border-slate-800/90 bg-slate-950/90 backdrop-blur-md px-4 md:px-6 flex items-center justify-between sticky top-0 z-30 select-none">
       {/* Left Brand Command Strip & Workspace Selector */}
@@ -39,9 +42,17 @@ export const Header: React.FC<HeaderProps> = ({ onAnalyzeClick, apiConnected = t
 
         {/* Backend Real Health Telemetry */}
         <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900 border border-slate-800 text-[11px] font-mono">
-          <span className={`w-2 h-2 rounded-full ${apiConnected ? 'bg-emerald-400 animate-pulse' : 'bg-rose-500'}`} />
-          <span className={apiConnected ? 'text-emerald-400 font-semibold' : 'text-rose-400 font-semibold'}>
-            API {apiConnected ? 'ONLINE (HTTP 200)' : 'OFFLINE'}
+          <span
+            className={`w-2 h-2 rounded-full ${apiConnected ? "bg-emerald-400 animate-pulse" : "bg-rose-500"}`}
+          />
+          <span
+            className={
+              apiConnected
+                ? "text-emerald-400 font-semibold"
+                : "text-rose-400 font-semibold"
+            }
+          >
+            API {apiConnected ? "ONLINE (HTTP 200)" : "OFFLINE"}
           </span>
         </div>
       </div>
@@ -84,7 +95,9 @@ export const Header: React.FC<HeaderProps> = ({ onAnalyzeClick, apiConnected = t
           <div className="w-7 h-7 rounded-full bg-amber-600 flex items-center justify-center text-xs font-bold text-slate-950 border border-amber-400/40 shadow-sm font-mono">
             AR
           </div>
-          <span className="hidden xl:inline text-xs font-mono text-slate-300">Alex Rivera</span>
+          <span className="hidden xl:inline text-xs font-mono text-slate-300">
+            Alex Rivera
+          </span>
         </div>
       </div>
     </header>
