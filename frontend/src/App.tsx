@@ -1,58 +1,86 @@
-import React, { useState, useEffect } from "react";
-import { Network, ShieldAlert, Sliders } from "lucide-react";
-import { Sidebar } from "./components/layout/Sidebar";
-import { Header } from "./components/layout/Header";
-import { Button } from "./components/ui/Button";
-import { ToastContainer } from "./components/ui/Toast";
-import { AnalyzeModal } from "./components/dashboard/AnalyzeModal";
-import { AnalysisDetailView } from "./components/dashboard/AnalysisDetailView";
-import { DecisionHeroHeader } from "./components/analysis/DecisionHeroHeader";
-import { ImpactNetworkGraph } from "./components/analysis/ImpactNetworkGraph";
-import { NodeDetailPanel } from "./components/analysis/NodeDetailPanel";
-import { RiskStorySection } from "./components/analysis/RiskStorySection";
-import { DecisionTimeline } from "./components/analysis/DecisionTimeline";
-import { UnknownsSection } from "./components/analysis/UnknownsSection";
-import { ChangeInvestigationHeader } from "./components/analysis/ChangeInvestigationHeader";
-import { ScenarioComparisonView } from "./components/scenarios/ScenarioComparisonView";
-import { LearningLoopView } from "./components/outcomes/LearningLoopView";
-import { OrgMemoryView } from "./components/memory/OrgMemoryView";
-import { ChangesListView } from "./components/changes/ChangesListView";
-import {
-  Change,
-  CreateChangePayload,
-  ImpactNode,
-  ToastMessage,
-  ChangeStatus,
-} from "./types";
-import {
-  fetchHealth,
-  fetchChanges,
-  createChange,
-  analyzeChange,
-} from "./services/api";
+import React, { useState, useEffect } from 'react';
+import { 
+  ProposedChange, 
+  ImpactGraph, 
+  ImpactNode, 
+  EvidenceRecord, 
+  ExplicitUnknown, 
+  GuardrailRecommendation, 
+  HumanDecision,
+  ToastMessage
+} from './types';
+import { 
+  fetchHealth, 
+  fetchChanges, 
+  fetchImpactGraph, 
+  fetchEvidence, 
+  fetchRecommendations 
+} from './services/api';
+
+import { HeroLanding } from './landing/HeroLanding';
+import { ImpactObservatory } from './experience/ImpactObservatory';
+import { CommandBar } from './navigation/CommandBar';
+import { LifecycleRail, LifecycleStage } from './navigation/LifecycleRail';
+import { SpatialControls } from './navigation/SpatialControls';
+
+import { ImpactInspector } from './panels/ImpactInspector';
+import { EvidencePanel } from './panels/EvidencePanel';
+import { UnknownsPanel } from './panels/UnknownsPanel';
+import { ScenarioPanel } from './panels/ScenarioPanel';
+import { DecisionPanel } from './panels/DecisionPanel';
+import { LearningPanel } from './panels/LearningPanel';
+import { IntakeModal } from './components/analysis/IntakeModal';
+import { ToastContainer } from './components/ui/Toast';
+
+const CANONICAL_DEMO_CHANGE: ProposedChange = {
+  id: 'ch-001',
+  title: 'Free Trial: 14 days → 7 days',
+  description: 'Shorten free trial duration from 14 days to 7 days to accelerate customer conversion velocity.',
+  category: 'ONBOARDING',
+  current_state: '14-day free trial',
+  proposed_state: '7-day free trial',
+  target_metric: 'Trial-to-Paid Conversion Rate',
+  owner: 'Product Growth Team',
+  risk_level: 'high',
+  status: 'analyzing',
+  affected_area_count: 5,
+  unknown_count: 3,
+  recommended_action_count: 2,
+  affected_areas: ['Onboarding', 'Conversion', 'Billing', 'Activation', 'Support'],
+  is_demo: true,
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString()
+};
 
 export const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState("overview");
-  const [changes, setChanges] = useState<Change[]>([]);
-  const [selectedChange, setSelectedChange] = useState<Change | null>(null);
-  const [selectedGraphNode, setSelectedGraphNode] = useState<ImpactNode | null>(
-    null,
-  );
+  // Navigation & View State
+  const [viewMode, setViewMode] = useState<'LANDING' | 'OBSERVATORY'>('LANDING');
+  const [is3DMode, setIs3DMode] = useState<boolean>(true);
+  const [currentStage, setCurrentStage] = useState<LifecycleStage>('PREDICT');
+  const [activeFilter, setActiveFilter] = useState<string>('ALL');
+  const [activePanel, setActivePanel] = useState<string | null>(null);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [showNetworkGraph, setShowNetworkGraph] = useState(true);
-  const [activeScenarioId, setActiveScenarioId] = useState<string>("expected");
-
+  // Data & Backend Connectivity
   const [apiConnected, setApiConnected] = useState(false);
+  const [changes, setChanges] = useState<ProposedChange[]>([CANONICAL_DEMO_CHANGE]);
+  const [activeChange, setActiveChange] = useState<ProposedChange>(CANONICAL_DEMO_CHANGE);
 
-  // Toast feedback notifications
+  // Intelligence Objects
+  const [graph, setGraph] = useState<ImpactGraph | null>(null);
+  const [evidence, setEvidence] = useState<EvidenceRecord[]>([]);
+  const [unknowns, setUnknowns] = useState<ExplicitUnknown[]>([]);
+  const [recommendations, setRecommendations] = useState<GuardrailRecommendation[]>([]);
+  const [decision, setDecision] = useState<HumanDecision | null>(null);
+
+  // Active Selected Node & Animation Signals
+  const [selectedNode, setSelectedNode] = useState<ImpactNode | null>(null);
+  const [isPulsing, setIsPulsing] = useState<boolean>(false);
+  const [isIntakeOpen, setIsIntakeOpen] = useState<boolean>(false);
+
+  // Toast Notifications
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
-  const addToast = (
-    type: ToastMessage["type"],
-    title: string,
-    description?: string,
-  ) => {
+  const addToast = (type: ToastMessage['type'], title: string, description?: string) => {
     const id = `toast-${Date.now()}-${Math.random()}`;
     setToasts((prev) => [...prev, { id, type, title, description }]);
     setTimeout(() => {
@@ -60,328 +88,199 @@ export const App: React.FC = () => {
     }, 4000);
   };
 
-  // Load API health and change records on mount
-  const loadInitialData = async () => {
-    const health = await fetchHealth();
-    const isConnected = !!health;
-    setApiConnected(isConnected);
-
-    const changeList = await fetchChanges();
-    setChanges(changeList);
-
-    if (isConnected) {
-      addToast(
-        "success",
-        "FastAPI Engine Online",
-        "Connected via Vite API proxy (v0.2.0)",
-      );
-    } else {
-      addToast(
-        "warning",
-        "Backend Offline Fallback",
-        "Running local demonstration fallback.",
-      );
-    }
-  };
-
+  // Initial Load: Health & Seeded Changes
   useEffect(() => {
-    loadInitialData();
+    const checkHealthAndLoad = async () => {
+      try {
+        const health = await fetchHealth();
+        setApiConnected(!!health);
+
+        const changeList = await fetchChanges();
+        if (changeList && changeList.length > 0) {
+          setChanges(changeList);
+          setActiveChange(changeList[0]);
+        }
+      } catch (err) {
+        console.error('FastAPI Engine health check failed:', err);
+        setApiConnected(false);
+      }
+    };
+    checkHealthAndLoad();
   }, []);
 
-  // Submit new change intake form -> API POST /api/changes -> API POST /api/changes/{id}/analyze
-  const handleCreateChange = async (payload: CreateChangePayload) => {
-    try {
-      const newChange = await createChange(payload);
-      const analyzedChange = await analyzeChange(newChange.id);
+  // Fetch graph & intelligence whenever activeChange updates
+  useEffect(() => {
+    if (!activeChange?.id) return;
 
-      setChanges((prev) => [
-        analyzedChange,
-        ...prev.filter((c) => c.id !== analyzedChange.id),
-      ]);
-      setSelectedChange(analyzedChange);
-      setShowNetworkGraph(true);
-      setActiveTab("overview");
+    const loadChangeIntelligence = async () => {
+      try {
+        const graphData = await fetchImpactGraph(activeChange.id);
+        if (graphData) {
+          setGraph(graphData);
+          setUnknowns(graphData.unknowns || []);
+        }
 
-      addToast(
-        "success",
-        "Impact Analysis Complete",
-        `Evaluated '${analyzedChange.title}' with Risk Score ${analyzedChange.analysis_result?.risk_score}/100.`,
-      );
-    } catch (error) {
-      console.error("Failed to submit and analyze change:", error);
-      addToast(
-        "error",
-        "Analysis Failed",
-        "Could not communicate with FastAPI analysis engine.",
-      );
-    }
-  };
+        const evidenceData = await fetchEvidence(activeChange.id);
+        if (evidenceData) setEvidence(evidenceData);
 
-  // Re-run analysis on an existing change
-  const handleReAnalyze = async (changeId: string) => {
-    try {
-      const updated = await analyzeChange(changeId);
-      setChanges((prev) => prev.map((c) => (c.id === changeId ? updated : c)));
-      setSelectedChange(updated);
-      addToast(
-        "info",
-        "Re-Analysis Complete",
-        `Updated consequence canvas for ${changeId}`,
-      );
-    } catch (error) {
-      console.error("Failed to re-analyze change:", error);
-      addToast("error", "Re-Analysis Failed");
-    }
-  };
+        const recData = await fetchRecommendations(activeChange.id);
+        if (recData) setRecommendations(recData);
 
+      } catch (err) {
+        console.error(`Failed loading intelligence for change ${activeChange.id}:`, err);
+      }
+    };
+
+    loadChangeIntelligence();
+  }, [activeChange.id]);
+
+  // Demo Trigger Action
   const handleExploreDemo = () => {
-    const demo = changes.find((c) => c.is_demo) || changes[0];
-    if (demo) {
-      setSelectedChange(demo);
-      setShowNetworkGraph(true);
-      setActiveTab("overview");
-      addToast(
-        "info",
-        "Loaded Demo Scenario",
-        `Focusing scenario: ${demo.title}`,
-      );
-    }
+    const demo = changes.find(c => c.id === 'ch-[#001]' || c.id === 'ch-001') || CANONICAL_DEMO_CHANGE;
+    setActiveChange(demo);
+    setViewMode('OBSERVATORY');
+    setCurrentStage('PREDICT');
+    addToast('info', 'Loaded Canonical Demo', `Focusing change scenario: ${demo.title}`);
   };
 
-  const activeDemoChange = changes.find((c) => c.is_demo) || changes[0];
-  const currentStatus: ChangeStatus = activeDemoChange?.status || "analyzing";
+  // Replay Impact Animation Handler
+  const handleReplayImpact = () => {
+    setIsPulsing(true);
+    addToast('info', 'Replaying Impact Propagation', 'Visualizing causal signal traveling through downstream nodes.');
+    setTimeout(() => setIsPulsing(false), 3000);
+  };
+
+  // New Analysis Creation Callback
+  const handleAnalysisStarted = (newChange: ProposedChange) => {
+    setChanges(prev => [newChange, ...prev]);
+    setActiveChange(newChange);
+    setViewMode('OBSERVATORY');
+    setCurrentStage('PREDICT');
+    addToast('success', 'Impact Simulation Complete', `Analyzed '${newChange.title}' with spatial consequence graph.`);
+  };
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#07090e] text-ivory-100 font-sans selection:bg-amber-500 selection:text-slate-950">
-      {/* Left Navigation Compact Rail */}
-      <Sidebar
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        apiConnected={apiConnected}
-      />
-
-      {/* Main Observatory Area */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden">
-        {/* Top Header Command Strip */}
-        <Header
-          onAnalyzeClick={() => setIsModalOpen(true)}
+    <div className="w-screen h-screen overflow-hidden bg-[#080B12] text-[#F5F3EE] font-sans selection:bg-[#F4C95D] selection:text-[#080B12]">
+      {viewMode === 'LANDING' ? (
+        <HeroLanding
+          onExploreDemo={handleExploreDemo}
+          onOpenAnalysis={() => setIsIntakeOpen(true)}
           apiConnected={apiConnected}
         />
+      ) : (
+        <div className="w-full h-full relative">
+          {/* Top Floating Command Bar */}
+          <CommandBar
+            changeTitle={activeChange.title}
+            apiConnected={apiConnected}
+            activeFilter={activeFilter}
+            onFilterChange={setActiveFilter}
+            onOpenIntake={() => setIsIntakeOpen(true)}
+            onResetDemo={handleExploreDemo}
+            onReturnLanding={() => setViewMode('LANDING')}
+          />
 
-        {/* Main Content Body */}
-        <div className="flex-1 flex overflow-hidden">
-          <main className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
-            {/* DECISION ROOM (OVERVIEW TAB) */}
-            {activeTab === "overview" && (
-              <>
-                {/* 1. EDITORIAL DECISION HERO INTRO */}
-                <DecisionHeroHeader
-                  onAnalyzeClick={() => setIsModalOpen(true)}
-                  onExploreDemoClick={handleExploreDemo}
-                />
+          {/* Spatial Canvas (3D WebGL / 2D Graph) */}
+          <ImpactObservatory
+            changeTitle={activeChange.title}
+            graph={graph}
+            selectedNode={selectedNode}
+            onSelectNode={(node) => {
+              setSelectedNode(node);
+              setActivePanel(null); // Dismiss other panels on node click
+            }}
+            is3DMode={is3DMode}
+            activeFilter={activeFilter}
+            isPulsing={isPulsing}
+          />
 
-                {/* 2. DECISION TIMELINE LIFECYCLE PIPELINE */}
-                <DecisionTimeline currentStatus={currentStatus} />
+          {/* Floating Spatial Toolbar Controls */}
+          <SpatialControls
+            onReplayImpact={handleReplayImpact}
+            onFitView={() => setSelectedNode(null)}
+            is3DMode={is3DMode}
+            onToggle3D={() => setIs3DMode(!is3DMode)}
+            activePanel={activePanel}
+            onTogglePanel={(pName) => {
+              setActivePanel(activePanel === pName ? null : pName);
+              if (selectedNode) setSelectedNode(null);
+            }}
+          />
 
-                {/* 3. COMPACT CHANGE INVESTIGATION TELEMETRY HEADER */}
-                {activeDemoChange && (
-                  <ChangeInvestigationHeader
-                    change={activeDemoChange}
-                    onInspectClick={() => setSelectedChange(activeDemoChange)}
-                  />
-                )}
+          {/* Bottom Interactive Lifecycle Rail */}
+          <LifecycleRail
+            currentStage={currentStage}
+            onStageChange={(stage) => {
+              setCurrentStage(stage);
+              if (stage === 'PROVE') setActivePanel('SCENARIOS');
+              else if (stage === 'SHIP') setActivePanel('DECISION');
+              else if (stage === 'OBSERVE' || stage === 'LEARNED') setActivePanel('LEARNING');
+              else setActivePanel(null);
+            }}
+          />
 
-                {/* 4. PRIMARY CANVAS — REACT FLOW CONSEQUENCE MAP */}
-                <section className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h2 className="text-xs font-bold text-ivory-100 flex items-center gap-2 font-mono uppercase tracking-wider">
-                        WHAT COULD THIS BREAK? — System Consequence Canvas
-                        <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-amber-950 text-amber-300 border border-amber-800/60 font-semibold">
-                          INTERACTIVE SPATIAL CANVAS
-                        </span>
-                      </h2>
-                    </div>
+          {/* Contextual Side Panels */}
+          {selectedNode && (
+            <ImpactInspector
+              node={selectedNode}
+              evidence={evidence}
+              recommendations={recommendations}
+              onClose={() => setSelectedNode(null)}
+            />
+          )}
 
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        icon={
-                          <Network className="w-3.5 h-3.5 text-amber-400" />
-                        }
-                        onClick={() => setShowNetworkGraph(!showNetworkGraph)}
-                      >
-                        {showNetworkGraph ? "Hide Canvas" : "Show Canvas"}
-                      </Button>
-                    </div>
-                  </div>
+          {activePanel === 'EVIDENCE' && (
+            <EvidencePanel
+              evidence={evidence}
+              onClose={() => setActivePanel(null)}
+            />
+          )}
 
-                  {/* React Flow Spatial System Map */}
-                  {showNetworkGraph && (
-                    <ImpactNetworkGraph
-                      changeTitle={
-                        activeDemoChange?.title ||
-                        "Free Trial: 14 days → 7 days"
-                      }
-                      onNodeSelect={(node) => setSelectedGraphNode(node)}
-                      selectedNodeId={selectedGraphNode?.id}
-                      activeScenarioId={activeScenarioId}
-                    />
-                  )}
-                </section>
+          {activePanel === 'UNKNOWNS' && (
+            <UnknownsPanel
+              unknowns={unknowns}
+              onClose={() => setActivePanel(null)}
+            />
+          )}
 
-                {/* 5. VISUAL RISK NARRATIVE ("WHY THIS MATTERS") */}
-                <RiskStorySection />
+          {activePanel === 'SCENARIOS' && (
+            <ScenarioPanel
+              changeId={activeChange.id}
+              onClose={() => setActivePanel(null)}
+            />
+          )}
 
-                {/* 6. SURFACED UNKNOWNS & UNCERTAINTY MATRIX */}
-                <UnknownsSection
-                  unknowns={
-                    activeDemoChange?.analysis_result?.assumptions_unknowns
-                  }
-                />
-              </>
-            )}
+          {activePanel === 'DECISION' && (
+            <DecisionPanel
+              changeId={activeChange.id}
+              currentDecision={decision}
+              recommendations={recommendations}
+              unknowns={unknowns}
+              onDecisionSubmitted={(newDec) => {
+                setDecision(newDec);
+                addToast('success', 'Decision Gate Recorded', `Proposal decision recorded as ${newDec.status}`);
+              }}
+              onClose={() => setActivePanel(null)}
+            />
+          )}
 
-            {/* CHANGES TAB */}
-            {activeTab === "changes" && (
-              <ChangesListView
-                changes={changes}
-                onSelectChange={(item) => setSelectedChange(item)}
-                onAnalyzeChange={handleReAnalyze}
-                onNewAnalysisClick={() => setIsModalOpen(true)}
-              />
-            )}
-
-            {/* SCENARIOS TAB */}
-            {activeTab === "scenarios" && (
-              <ScenarioComparisonView
-                onSelectScenario={(scId) => {
-                  setActiveScenarioId(scId);
-                  addToast(
-                    "info",
-                    "Scenario Active",
-                    `Switched network emphasis to ${scId.toUpperCase()} scenario.`,
-                  );
-                }}
-              />
-            )}
-
-            {/* OUTCOMES TAB */}
-            {activeTab === "outcomes" && <LearningLoopView />}
-
-            {/* ORG MEMORY TAB */}
-            {activeTab === "org_memory" && <OrgMemoryView />}
-
-            {/* SETTINGS TAB */}
-            {activeTab === "settings" && (
-              <div className="space-y-6 max-w-3xl">
-                <div className="bg-[#0b0e17] border border-slate-800/90 rounded-xl p-6 shadow-xl">
-                  <h2 className="text-xl font-bold text-ivory-100 font-sans">
-                    Observatory Configuration & Telemetry
-                  </h2>
-                  <p className="text-xs text-slate-400 mt-1 font-mono">
-                    Manage workspace environment, API endpoints, risk
-                    thresholds, and notification webhooks.
-                  </p>
-                </div>
-
-                <div className="bg-[#0b0e17] border border-slate-800/90 rounded-xl p-6 space-y-5 shadow-xl">
-                  <h3 className="text-sm font-bold text-ivory-100 flex items-center gap-2 font-mono">
-                    <Sliders className="w-4 h-4 text-amber-400" />
-                    Vite Proxy & FastAPI Telemetry
-                  </h3>
-
-                  <div className="space-y-3 text-xs">
-                    <div>
-                      <label className="block text-slate-300 font-semibold mb-1">
-                        FastAPI Proxy Endpoint
-                      </label>
-                      <input
-                        type="text"
-                        readOnly
-                        value="/api (Proxied to http://127.0.0.1:8000)"
-                        className="w-full bg-[#07090e] border border-slate-800 rounded px-3 py-2 text-amber-300 font-mono"
-                      />
-                    </div>
-
-                    <div className="flex items-center justify-between p-3 rounded bg-[#07090e] border border-slate-800 font-mono">
-                      <div>
-                        <span className="font-semibold text-slate-200 block">
-                          FastAPI Telemetry Probe
-                        </span>
-                        <span className="text-slate-400 text-[11px]">
-                          GET /api/health monitoring
-                        </span>
-                      </div>
-                      <span
-                        className={`px-2.5 py-1 rounded text-xs font-mono font-bold ${apiConnected ? "bg-emerald-950 text-emerald-300 border border-emerald-800" : "bg-rose-950 text-rose-300 border border-rose-800"}`}
-                      >
-                        API {apiConnected ? "ONLINE (HTTP 200)" : "OFFLINE"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-[#0b0e17] border border-slate-800/90 rounded-xl p-6 space-y-4 shadow-xl">
-                  <h3 className="text-sm font-bold text-ivory-100 flex items-center gap-2 font-mono">
-                    <ShieldAlert className="w-4 h-4 text-rose-400" />
-                    Risk Guardrail Thresholds
-                  </h3>
-                  <div className="space-y-2 text-xs text-slate-300 font-mono">
-                    <div className="flex items-center justify-between p-3 rounded bg-[#07090e] border border-slate-800">
-                      <span>
-                        Require mandatory team review for risk scores &gt;
-                        80/100
-                      </span>
-                      <span className="text-emerald-400 font-bold">
-                        Enabled
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between p-3 rounded bg-[#07090e] border border-slate-800">
-                      <span>
-                        Automated Slack alert on critical downstream node
-                        identification
-                      </span>
-                      <span className="text-emerald-400 font-bold">
-                        Enabled
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </main>
-
-          {/* RIGHT SIDE CONTEXTUAL INVESTIGATION INSPECTOR PANEL */}
-          {selectedGraphNode && (
-            <NodeDetailPanel
-              node={selectedGraphNode}
-              onClose={() => setSelectedGraphNode(null)}
-              onGuardrailAdd={(guardrail) =>
-                addToast("success", "Guardrail Added", guardrail)
-              }
+          {activePanel === 'LEARNING' && (
+            <LearningPanel
+              changeId={activeChange.id}
+              onClose={() => setActivePanel(null)}
             />
           )}
         </div>
-      </div>
-
-      {/* Modal for Creating / Analyzing a Change */}
-      <AnalyzeModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={handleCreateChange}
-      />
-
-      {/* Detailed Analysis Decision Intelligence View */}
-      {selectedChange && (
-        <AnalysisDetailView
-          change={selectedChange}
-          onClose={() => setSelectedChange(null)}
-        />
       )}
 
-      {/* Toast Notifications Container */}
+      {/* Propose Change Intake Modal */}
+      <IntakeModal
+        isOpen={isIntakeOpen}
+        onClose={() => setIsIntakeOpen(false)}
+        onAnalysisStarted={handleAnalysisStarted}
+      />
+
+      {/* Toast Feedback */}
       <ToastContainer
         toasts={toasts}
         onDismiss={(id) => setToasts((prev) => prev.filter((t) => t.id !== id))}

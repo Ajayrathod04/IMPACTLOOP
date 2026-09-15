@@ -1,5 +1,5 @@
 /**
- * ImpactLoop Core Domain Types & Interfaces - Step 3 Impact Observatory
+ * ImpactLoop Core Domain Types & Interfaces - Step 3 & Step 4 Impact Observatory
  */
 
 export type RiskLevel = "low" | "medium" | "high" | "critical";
@@ -12,45 +12,43 @@ export type ChangeStatus =
   | "observing"
   | "learned";
 
-export type NodeTypeCategory =
-  | "known"
-  | "assumed"
-  | "unknown"
-  | "high_risk"
-  | "observed";
+export type ProvenanceState = "VERIFIED_FACT" | "PROBABILISTIC_INFERENCE" | "EXPLICIT_UNKNOWN";
+
+export type NodeTypeCategory = "known" | "assumed" | "unknown" | "high_risk" | "observed";
+
+export type ActiveTab = "DECISION_ROOM" | "SCENARIOS" | "OUTCOMES" | "MEMORY" | "CHANGES";
 
 export interface ImpactNode {
   id: string;
-  change_id: string;
-  name: string;
+  change_id?: string;
+  title?: string;
+  name?: string;
   domain_type: string;
   depth: number;
   confidence_score: number;
-  details?: string;
+  severity_score?: number;
   severity?: RiskLevel;
   why_affected?: string;
-  evidence?: string[];
+  predicted_consequence?: string;
+  recommended_validation?: string;
   recommended_action?: string;
-  node_type?: NodeTypeCategory;
+  provenance?: ProvenanceState;
+  evidence_ids?: string[];
+  evidence?: string[];
+  details?: string;
+  node_type?: NodeTypeCategory | string;
   business_effect?: string;
   unverified_assumptions_count?: number;
 }
 
-export interface Evidence {
-  id: string;
-  node_id: string;
-  source: string;
-  text: string;
-  strength_score: number;
-}
-
-export interface Risk {
-  id: string;
-  change_id: string;
-  title: string;
-  description: string;
-  severity: RiskLevel;
-  likelihood: number;
+export interface ImpactEdge {
+  id?: string;
+  source_id: string;
+  target_id: string;
+  relationship: string;
+  strength: number;
+  confidence: number;
+  provenance?: ProvenanceState;
 }
 
 export interface Action {
@@ -60,32 +58,6 @@ export interface Action {
   owner?: string;
   status: "pending" | "in_progress" | "completed";
   priority: "low" | "medium" | "high" | "urgent";
-}
-
-export interface Scenario {
-  id: string;
-  change_id: string;
-  name: string;
-  probability: number;
-  impact_description: string;
-  affected_systems: string[];
-  risk_level: RiskLevel;
-  confidence: number;
-  activation_delta?: string;
-  revenue_delta?: string;
-  support_delta?: string;
-}
-
-export interface Outcome {
-  id: string;
-  change_id: string;
-  metric_name: string;
-  predicted_result: string;
-  actual_result: string;
-  delta: string;
-  lessons_learned: string[];
-  shipped_date: string;
-  observed_date: string;
 }
 
 export interface AnalysisResult {
@@ -100,6 +72,100 @@ export interface AnalysisResult {
   analyzed_at: string;
 }
 
+export interface ImpactGraph {
+  graph_id: string;
+  change_id: string;
+  nodes: ImpactNode[];
+  edges: ImpactEdge[];
+  risk_assessment?: RiskAssessment;
+  unknowns?: ExplicitUnknown[];
+}
+
+export interface EvidenceRecord {
+  id: string;
+  title: string;
+  summary: string;
+  source_type: string;
+  strength: number;
+  confidence: number;
+  node_id?: string;
+}
+
+export interface ExplicitUnknown {
+  id: string;
+  title: string;
+  description: string;
+  resolution_method: string;
+  impact_level: string;
+}
+
+export interface RiskFactors {
+  breadth: number;
+  downstream_depth: number;
+  severity: number;
+  uncertainty: number;
+  evidence_strength: number;
+}
+
+export interface RiskAssessment {
+  overall_risk_score: number;
+  risk_level: RiskLevel;
+  model_confidence: number;
+  risk_factors: RiskFactors;
+  explanation: string;
+}
+
+export interface GuardrailRecommendation {
+  id: string;
+  title: string;
+  rationale: string;
+  category: string;
+  priority: string;
+}
+
+export interface HumanDecision {
+  status: "APPROVED" | "REVIEW_REQUIRED" | "HOLD";
+  reviewer: string;
+  rationale: string;
+  acknowledged_guardrails: string[];
+  timestamp: string;
+}
+
+export interface MetricObservation {
+  metric_name: string;
+  predicted_change: number;
+  observed_change: number;
+  variance: number;
+  confidence_score: number;
+  timestamp: string;
+}
+
+export interface LearningRecord {
+  learned_pattern: string;
+  confidence_adjustment: number;
+  model_update_summary: string;
+  timestamp: string;
+}
+
+export interface OrgMemoryItem {
+  id: string;
+  title: string;
+  category: string;
+  summary: string;
+  confidence: number;
+  source_change_id: string;
+  provenance: string;
+  timestamp: string;
+  tags?: string[];
+  date?: string;
+  key_finding?: string;
+  validated_assumption?: string;
+  reusable_rule?: string;
+  historical_outcome?: string;
+  impact_rating?: string;
+  source?: string;
+}
+
 export interface CreateChangePayload {
   title: string;
   description?: string;
@@ -107,6 +173,8 @@ export interface CreateChangePayload {
   intended_outcome?: string;
   current_state?: string;
   proposed_state?: string;
+  target_metric?: string;
+  owner?: string;
   affected_systems?: string[];
 }
 
@@ -118,6 +186,7 @@ export interface Change {
   intended_outcome?: string;
   current_state?: string;
   proposed_state?: string;
+  target_metric?: string;
   owner?: string;
   risk_level: RiskLevel;
   status: ChangeStatus;
@@ -131,33 +200,7 @@ export interface Change {
   updated_at: string;
 }
 
-export interface Workspace {
-  id: string;
-  name: string;
-  organization: string;
-  activeChangesCount: number;
-}
-
-export interface RiskStoryStep {
-  step: number;
-  label: string;
-  title: string;
-  description: string;
-  iconType: "change" | "downstream" | "impact" | "guardrail";
-}
-
-export interface OrgMemoryItem {
-  id: string;
-  title: string;
-  category: string;
-  date: string;
-  key_finding: string;
-  validated_assumption: string;
-  reusable_rule: string;
-  historical_outcome: string;
-  impact_rating: string;
-  source: string;
-}
+export type ProposedChange = Change;
 
 export interface ToastMessage {
   id: string;
