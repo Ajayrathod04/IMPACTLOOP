@@ -1,33 +1,42 @@
-/* ImpactLoop Design System CSS - Spatial Observatory Visual Tokens */
+/* ImpactLoop Design System CSS - Friendly Premium Tech Tokens */
 
-@import url('https://fonts.googleapis.com/css2?family=Bowlby+One+SC&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700;800&family=Titan+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bowlby+One+SC&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&family=Titan+One&display=swap');
 
 :root {
-  --font-display: 'Titan One', 'Bowlby One SC', display;
+  --font-syne: 'Syne', sans-serif;
+  --font-space: 'Space Grotesk', sans-serif;
+  --font-display: 'Titan One', 'Syne', sans-serif;
   --font-outfit: 'Outfit', 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
-  /* Color System */
-  --bg-deep: #080B12;
-  --bg-surface: #0E1320;
-  --bg-panel: #131826;
-  --bg-panel-hover: #1A2234;
-  --border-dim: rgba(139, 124, 255, 0.15);
-  --border-bright: rgba(244, 201, 93, 0.4);
-
-  /* Accents */
-  --color-amber: #F4C95D;
+  /* Premium Friendly Palette */
+  --bg-graphite: #10131A;
+  --bg-navy: #151A27;
+  --bg-surface: #1B2234;
+  --bg-panel: rgba(21, 26, 39, 0.90);
+  --color-warm-ivory: #F7F3EA;
+  --color-gold: #F4C95D;
   --color-coral: #FF6B5E;
   --color-cyan: #35D6C5;
   --color-violet: #8B7CFF;
   --color-lime: #B8E986;
-  --color-cream: #F5F3EE;
   --color-subtle: #8E9BAE;
+
+  --border-dim: rgba(139, 124, 255, 0.18);
+  --border-bright: rgba(244, 201, 93, 0.45);
+}
+
+.font-syne {
+  font-family: var(--font-syne);
+}
+
+.font-space {
+  font-family: var(--font-space);
 }
 
 .font-display {
   font-family: var(--font-display);
-  letter-spacing: 0.02em;
+  letter-spacing: -0.01em;
 }
 
 .font-outfit {
@@ -40,23 +49,23 @@
 
 /* Glassmorphism & Panel Styling */
 .observatory-panel {
-  background: rgba(19, 24, 38, 0.88);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: var(--bg-panel);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--border-dim);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .observatory-panel-gold {
-  background: rgba(19, 24, 38, 0.92);
-  border: 1px solid rgba(244, 201, 93, 0.35);
-  box-shadow: 0 0 25px rgba(244, 201, 93, 0.12), inset 0 1px 0 rgba(244, 201, 93, 0.2);
+  background: rgba(21, 26, 39, 0.94);
+  border: 1px solid rgba(244, 201, 93, 0.4);
+  box-shadow: 0 0 30px rgba(244, 201, 93, 0.15), inset 0 1px 0 rgba(244, 201, 93, 0.25);
 }
 
 .observatory-hud {
-  background: rgba(8, 11, 18, 0.85);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(139, 124, 255, 0.2);
+  background: rgba(16, 19, 26, 0.88);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(139, 124, 255, 0.25);
 }
 
 /* Custom Scrollbars */
@@ -65,11 +74,11 @@
   height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #080B12;
+  background: #10131A;
 }
 ::-webkit-scrollbar-thumb {
   background: #1B2234;
-  border-radius: 3px;
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #F4C95D;
