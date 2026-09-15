@@ -1,56 +1,49 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  ProposedChange, 
-  ImpactGraph, 
-  ImpactNode, 
-  EvidenceRecord, 
-  ExplicitUnknown, 
-  GuardrailRecommendation, 
+import {
+  ProposedChange,
+  ImpactGraph,
+  ImpactNode,
+  EvidenceRecord,
+  ExplicitUnknown,
+  GuardrailRecommendation,
   HumanDecision,
   ToastMessage
 } from './types';
-import { 
-  fetchHealth, 
-  fetchChanges, 
-  fetchImpactGraph, 
-  fetchEvidence, 
-  fetchRecommendations 
+import {
+  fetchHealth,
+  fetchChanges,
+  fetchImpactGraph,
+  fetchEvidence,
+  fetchRecommendations
 } from './services/api';
 
-import { HeroLanding } from './landing/HeroLanding';
-import { ImpactObservatory } from './experience/ImpactObservatory';
-import { CommandBar } from './navigation/CommandBar';
-import { LifecycleRail, LifecycleStage } from './navigation/LifecycleRail';
-import { SpatialControls } from './navigation/SpatialControls';
+import {
+  CANONICAL_DEMO_CHANGE,
+  DEMO_GRAPH,
+  DEMO_EVIDENCE,
+  DEMO_RECOMMENDATIONS,
+  DEMO_HUMAN_DECISION
+} from './data/demo';
 
-import { ImpactInspector } from './panels/ImpactInspector';
-import { EvidencePanel } from './panels/EvidencePanel';
-import { UnknownsPanel } from './panels/UnknownsPanel';
-import { ScenarioPanel } from './panels/ScenarioPanel';
-import { DecisionPanel } from './panels/DecisionPanel';
-import { LearningPanel } from './panels/LearningPanel';
-import { IntakeModal } from './components/analysis/IntakeModal';
+import { LandingExperience } from './experience/LandingExperience';
+import { ImpactObservatory } from './experience/ImpactObservatory';
+import { CommandHUD } from './hud/CommandHUD';
+import { LifecycleRail, LifecycleStage } from './hud/LifecycleRail';
+import { SpatialControls } from './hud/SpatialControls';
+
+import { ImpactInspector } from './intelligence/ImpactInspector';
+import { EvidencePanel } from './intelligence/EvidencePanel';
+import { UnknownsPanel } from './intelligence/UnknownsPanel';
+import { ScenarioPanel } from './intelligence/ScenarioPanel';
+import { DecisionGate } from './intelligence/DecisionGate';
+import { OutcomePanel } from './intelligence/OutcomePanel';
+import { MemoryPanel } from './intelligence/MemoryPanel';
+
+import { ChangeIntake } from './intake/ChangeIntake';
 import { ToastContainer } from './components/ui/Toast';
 
-const CANONICAL_DEMO_CHANGE: ProposedChange = {
-  id: 'ch-001',
-  title: 'Free Trial: 14 days → 7 days',
-  description: 'Shorten free trial duration from 14 days to 7 days to accelerate customer conversion velocity.',
-  category: 'ONBOARDING',
-  current_state: '14-day free trial',
-  proposed_state: '7-day free trial',
-  target_metric: 'Trial-to-Paid Conversion Rate',
-  owner: 'Product Growth Team',
-  risk_level: 'high',
-  status: 'analyzing',
-  affected_area_count: 5,
-  unknown_count: 3,
-  recommended_action_count: 2,
-  affected_areas: ['Onboarding', 'Conversion', 'Billing', 'Activation', 'Support'],
-  is_demo: true,
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString()
-};
+import './styles/design-system.css';
+import './styles/observatory.css';
 
 export const App: React.FC = () => {
   // Navigation & View State
@@ -65,12 +58,12 @@ export const App: React.FC = () => {
   const [changes, setChanges] = useState<ProposedChange[]>([CANONICAL_DEMO_CHANGE]);
   const [activeChange, setActiveChange] = useState<ProposedChange>(CANONICAL_DEMO_CHANGE);
 
-  // Intelligence Objects
-  const [graph, setGraph] = useState<ImpactGraph | null>(null);
-  const [evidence, setEvidence] = useState<EvidenceRecord[]>([]);
-  const [unknowns, setUnknowns] = useState<ExplicitUnknown[]>([]);
-  const [recommendations, setRecommendations] = useState<GuardrailRecommendation[]>([]);
-  const [decision, setDecision] = useState<HumanDecision | null>(null);
+  // Intelligence Objects with Deterministic Fallbacks
+  const [graph, setGraph] = useState<ImpactGraph | null>(DEMO_GRAPH);
+  const [evidence, setEvidence] = useState<EvidenceRecord[]>(DEMO_EVIDENCE);
+  const [unknowns, setUnknowns] = useState<ExplicitUnknown[]>(DEMO_GRAPH.unknowns || []);
+  const [recommendations, setRecommendations] = useState<GuardrailRecommendation[]>(DEMO_RECOMMENDATIONS);
+  const [decision, setDecision] = useState<HumanDecision | null>(DEMO_HUMAN_DECISION);
 
   // Active Selected Node & Animation Signals
   const [selectedNode, setSelectedNode] = useState<ImpactNode | null>(null);
@@ -88,56 +81,68 @@ export const App: React.FC = () => {
     }, 4000);
   };
 
-  // Initial Load: Health & Seeded Changes
+  // Initial Load: Health Check & Backend API Sync
   useEffect(() => {
     const checkHealthAndLoad = async () => {
       try {
         const health = await fetchHealth();
         setApiConnected(!!health);
 
-        const changeList = await fetchChanges();
-        if (changeList && changeList.length > 0) {
-          setChanges(changeList);
-          setActiveChange(changeList[0]);
+        if (health) {
+          const changeList = await fetchChanges();
+          if (changeList && changeList.length > 0) {
+            setChanges(changeList);
+          }
         }
       } catch (err) {
-        console.error('FastAPI Engine health check failed:', err);
+        console.log('FastAPI engine check failed, operating in deterministic local demo mode:', err);
         setApiConnected(false);
       }
     };
     checkHealthAndLoad();
   }, []);
 
-  // Fetch graph & intelligence whenever activeChange updates
+  // Sync API intelligence when active change changes
   useEffect(() => {
     if (!activeChange?.id) return;
+
+    // Default to deterministic demo data
+    setGraph(DEMO_GRAPH);
+    setEvidence(DEMO_EVIDENCE);
+    setUnknowns(DEMO_GRAPH.unknowns || []);
+    setRecommendations(DEMO_RECOMMENDATIONS);
+
+    if (!apiConnected) return;
 
     const loadChangeIntelligence = async () => {
       try {
         const graphData = await fetchImpactGraph(activeChange.id);
-        if (graphData) {
+        if (graphData && graphData.nodes?.length > 0) {
           setGraph(graphData);
-          setUnknowns(graphData.unknowns || []);
+          if (graphData.unknowns) setUnknowns(graphData.unknowns);
         }
 
         const evidenceData = await fetchEvidence(activeChange.id);
-        if (evidenceData) setEvidence(evidenceData);
+        if (evidenceData && evidenceData.length > 0) setEvidence(evidenceData);
 
         const recData = await fetchRecommendations(activeChange.id);
-        if (recData) setRecommendations(recData);
-
+        if (recData && recData.length > 0) setRecommendations(recData);
       } catch (err) {
-        console.error(`Failed loading intelligence for change ${activeChange.id}:`, err);
+        console.warn(`Local fallback active for change ${activeChange.id}:`, err);
       }
     };
 
     loadChangeIntelligence();
-  }, [activeChange.id]);
+  }, [activeChange.id, apiConnected]);
 
-  // Demo Trigger Action
+  // Explore Demo Action Handler (Guaranteed zero dead-ends)
   const handleExploreDemo = () => {
-    const demo = changes.find(c => c.id === 'ch-[#001]' || c.id === 'ch-001') || CANONICAL_DEMO_CHANGE;
+    const demo = changes.find((c) => c.id === 'ch-[#001]' || c.id === 'ch-001') || CANONICAL_DEMO_CHANGE;
     setActiveChange(demo);
+    setGraph(DEMO_GRAPH);
+    setEvidence(DEMO_EVIDENCE);
+    setUnknowns(DEMO_GRAPH.unknowns || []);
+    setRecommendations(DEMO_RECOMMENDATIONS);
     setViewMode('OBSERVATORY');
     setCurrentStage('PREDICT');
     addToast('info', 'Loaded Canonical Demo', `Focusing change scenario: ${demo.title}`);
@@ -146,13 +151,13 @@ export const App: React.FC = () => {
   // Replay Impact Animation Handler
   const handleReplayImpact = () => {
     setIsPulsing(true);
-    addToast('info', 'Replaying Impact Propagation', 'Visualizing causal signal traveling through downstream nodes.');
-    setTimeout(() => setIsPulsing(false), 3000);
+    addToast('info', 'Replaying Causal Propagation', 'Visualizing signal traveling through downstream system nodes.');
+    setTimeout(() => setIsPulsing(false), 3500);
   };
 
-  // New Analysis Creation Callback
+  // New Analysis Intake Handler
   const handleAnalysisStarted = (newChange: ProposedChange) => {
-    setChanges(prev => [newChange, ...prev]);
+    setChanges((prev) => [newChange, ...prev]);
     setActiveChange(newChange);
     setViewMode('OBSERVATORY');
     setCurrentStage('PREDICT');
@@ -160,17 +165,17 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="w-screen h-screen overflow-hidden bg-[#080B12] text-[#F5F3EE] font-sans selection:bg-[#F4C95D] selection:text-[#080B12]">
+    <div className="w-screen h-screen overflow-hidden bg-[#080B12] text-[#F5F3EE] font-outfit selection:bg-[#F4C95D] selection:text-[#080B12]">
       {viewMode === 'LANDING' ? (
-        <HeroLanding
+        <LandingExperience
           onExploreDemo={handleExploreDemo}
           onOpenAnalysis={() => setIsIntakeOpen(true)}
           apiConnected={apiConnected}
         />
       ) : (
-        <div className="w-full h-full relative">
-          {/* Top Floating Command Bar */}
-          <CommandBar
+        <div className="w-full h-full relative overflow-hidden">
+          {/* Top Command HUD */}
+          <CommandHUD
             changeTitle={activeChange.title}
             apiConnected={apiConnected}
             activeFilter={activeFilter}
@@ -180,21 +185,21 @@ export const App: React.FC = () => {
             onReturnLanding={() => setViewMode('LANDING')}
           />
 
-          {/* Spatial Canvas (3D WebGL / 2D Graph) */}
+          {/* Main Spatial Observatory Canvas (3D WebGL / 2D Graph) */}
           <ImpactObservatory
             changeTitle={activeChange.title}
             graph={graph}
             selectedNode={selectedNode}
             onSelectNode={(node) => {
               setSelectedNode(node);
-              setActivePanel(null); // Dismiss other panels on node click
+              setActivePanel(null); // Dismiss global panels on node focus
             }}
             is3DMode={is3DMode}
             activeFilter={activeFilter}
             isPulsing={isPulsing}
           />
 
-          {/* Floating Spatial Toolbar Controls */}
+          {/* Floating Toolbar Controls */}
           <SpatialControls
             onReplayImpact={handleReplayImpact}
             onFitView={() => setSelectedNode(null)}
@@ -212,14 +217,15 @@ export const App: React.FC = () => {
             currentStage={currentStage}
             onStageChange={(stage) => {
               setCurrentStage(stage);
-              if (stage === 'PROVE') setActivePanel('SCENARIOS');
-              else if (stage === 'SHIP') setActivePanel('DECISION');
-              else if (stage === 'OBSERVE' || stage === 'LEARNED') setActivePanel('LEARNING');
+              if (stage === 'PROVE') setActivePanel('EVIDENCE');
+              else if (stage === 'DECIDE') setActivePanel('DECISION');
+              else if (stage === 'OBSERVE') setActivePanel('OUTCOMES');
+              else if (stage === 'LEARN') setActivePanel('MEMORY');
               else setActivePanel(null);
             }}
           />
 
-          {/* Contextual Side Panels */}
+          {/* Contextual Intelligence Panels */}
           {selectedNode && (
             <ImpactInspector
               node={selectedNode}
@@ -251,7 +257,7 @@ export const App: React.FC = () => {
           )}
 
           {activePanel === 'DECISION' && (
-            <DecisionPanel
+            <DecisionGate
               changeId={activeChange.id}
               currentDecision={decision}
               recommendations={recommendations}
@@ -264,8 +270,15 @@ export const App: React.FC = () => {
             />
           )}
 
-          {activePanel === 'LEARNING' && (
-            <LearningPanel
+          {activePanel === 'OUTCOMES' && (
+            <OutcomePanel
+              changeId={activeChange.id}
+              onClose={() => setActivePanel(null)}
+            />
+          )}
+
+          {activePanel === 'MEMORY' && (
+            <MemoryPanel
               changeId={activeChange.id}
               onClose={() => setActivePanel(null)}
             />
@@ -274,7 +287,7 @@ export const App: React.FC = () => {
       )}
 
       {/* Propose Change Intake Modal */}
-      <IntakeModal
+      <ChangeIntake
         isOpen={isIntakeOpen}
         onClose={() => setIsIntakeOpen(false)}
         onAnalysisStarted={handleAnalysisStarted}

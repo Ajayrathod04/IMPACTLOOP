@@ -1,0 +1,76 @@
+/* ImpactLoop Design System CSS - Spatial Observatory Visual Tokens */
+
+@import url('https://fonts.googleapis.com/css2?family=Bowlby+One+SC&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700;800&family=Titan+One&display=swap');
+
+:root {
+  --font-display: 'Titan One', 'Bowlby One SC', display;
+  --font-outfit: 'Outfit', 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Color System */
+  --bg-deep: #080B12;
+  --bg-surface: #0E1320;
+  --bg-panel: #131826;
+  --bg-panel-hover: #1A2234;
+  --border-dim: rgba(139, 124, 255, 0.15);
+  --border-bright: rgba(244, 201, 93, 0.4);
+
+  /* Accents */
+  --color-amber: #F4C95D;
+  --color-coral: #FF6B5E;
+  --color-cyan: #35D6C5;
+  --color-violet: #8B7CFF;
+  --color-lime: #B8E986;
+  --color-cream: #F5F3EE;
+  --color-subtle: #8E9BAE;
+}
+
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: 0.02em;
+}
+
+.font-outfit {
+  font-family: var(--font-outfit);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* Glassmorphism & Panel Styling */
+.observatory-panel {
+  background: rgba(19, 24, 38, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-dim);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.observatory-panel-gold {
+  background: rgba(19, 24, 38, 0.92);
+  border: 1px solid rgba(244, 201, 93, 0.35);
+  box-shadow: 0 0 25px rgba(244, 201, 93, 0.12), inset 0 1px 0 rgba(244, 201, 93, 0.2);
+}
+
+.observatory-hud {
+  background: rgba(8, 11, 18, 0.85);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(139, 124, 255, 0.2);
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #080B12;
+}
+::-webkit-scrollbar-thumb {
+  background: #1B2234;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #F4C95D;
+}

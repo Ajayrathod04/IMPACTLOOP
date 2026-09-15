@@ -1,0 +1,72 @@
+/* Spatial Observatory Custom Animations and Spatial Grid Styles */
+
+@keyframes pulse-core {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 20px rgba(244, 201, 93, 0.4));
+  }
+  50% {
+    transform: scale(1.06);
+    filter: drop-shadow(0 0 40px rgba(244, 201, 93, 0.8));
+  }
+}
+
+@keyframes orbit-slow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes signal-flow {
+  0% {
+    stroke-dashoffset: 100;
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0.2;
+  }
+}
+
+@keyframes float-node {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+.animate-pulse-core {
+  animation: pulse-core 3.5s ease-in-out infinite;
+}
+
+.animate-orbit {
+  animation: orbit-slow 24s linear infinite;
+}
+
+.animate-float-node {
+  animation: float-node 5s ease-in-out infinite;
+}
+
+.observatory-grid-bg {
+  background-size: 50px 50px;
+  background-image:
+    radial-gradient(circle, rgba(139, 124, 255, 0.12) 1px, transparent 1px),
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+}
+
+.glow-amber {
+  box-shadow: 0 0 20px rgba(244, 201, 93, 0.35);
+}
+
+.glow-coral {
+  box-shadow: 0 0 20px rgba(255, 107, 94, 0.35);
+}
+
+.glow-cyan {
+  box-shadow: 0 0 20px rgba(53, 214, 197, 0.35);
+}
+
+.glow-violet {
+  box-shadow: 0 0 20px rgba(139, 124, 255, 0.35);
+}
