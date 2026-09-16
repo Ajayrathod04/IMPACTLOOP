@@ -2,6 +2,3 @@
 name = "impactloop"
 version = "0.1.0"
 description = "ImpactLoop Change Impact Intelligence"
-
-[tool.vercel]
-entrypoint = "backend.app.main:app"

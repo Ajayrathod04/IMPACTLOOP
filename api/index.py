@@ -3,12 +3,13 @@
 import sys
 import os
 
-# Insert backend directory into sys.path
-backend_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "backend"))
-if backend_path not in sys.path:
-    sys.path.insert(0, backend_path)
+# Deterministic sys.path insertion for Vercel Serverless environment
+current_dir = os.path.dirname(os.path.abspath(__file__))
+root_dir = os.path.abspath(os.path.join(current_dir, ".."))
+backend_dir = os.path.join(root_dir, "backend")
+
+for path in [backend_dir, root_dir, current_dir, os.getcwd()]:
+    if os.path.exists(path) and path not in sys.path:
+        sys.path.insert(0, path)
 
 from app.main import app
-
-# Explicit top-level FastAPI instance variable for Vercel detector
-app = app
