@@ -55,7 +55,10 @@ frontend_dist = os.path.abspath(
 if os.path.exists(frontend_dist):
     assets_dir = os.path.join(frontend_dist, "assets")
     if os.path.exists(assets_dir):
-        app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
+        try:
+            app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
+        except Exception:
+            pass
 
     @app.get("/app/{full_path:path}")
     async def serve_frontend(full_path: str):
@@ -63,3 +66,4 @@ if os.path.exists(frontend_dist):
         if os.path.isfile(target_file):
             return FileResponse(target_file)
         return FileResponse(os.path.join(frontend_dist, "index.html"))
+
