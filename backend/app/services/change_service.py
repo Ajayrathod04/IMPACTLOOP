@@ -25,6 +25,6 @@ class ChangeService:
         return db_store.create(req)
 
     @staticmethod
-    def analyze_change(change_id: str) -> Optional[Change]:
+    def analyze_change(change_id: str, preferred_provider: Optional[str] = None) -> Optional[Change]:
         """Trigger local analysis engine for target change."""
-        return db_store.analyze(change_id)
+        return db_store.analyze(change_id, preferred_provider=preferred_provider)
