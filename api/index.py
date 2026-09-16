@@ -3,7 +3,7 @@
 import sys
 import os
 
-# Ensure api directory, app directory, root directory, and backend directory are all on sys.path
+# Ensure all possible module paths are in sys.path
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.abspath(os.path.join(current_dir, ".."))
 backend_dir = os.path.abspath(os.path.join(parent_dir, "backend"))
@@ -20,8 +20,12 @@ try:
     from app.api.health import router as health_router
     from app.api.changes import router as changes_router
 except ImportError:
-    from api.health import router as health_router
-    from api.changes import router as changes_router
+    try:
+        from api.health import router as health_router
+        from api.changes import router as changes_router
+    except ImportError:
+        from backend.app.api.health import router as health_router
+        from backend.app.api.changes import router as changes_router
 
 app = FastAPI(
     title="ImpactLoop API",
@@ -45,13 +49,11 @@ app.include_router(changes_router)
 
 @app.get("/")
 @app.get("/api")
-@app.get("/api/index")
-@app.get("/api/index.py")
+@app.get("/health")
+@app.get("/api/health")
 async def root():
     return {
-        "name": "ImpactLoop API",
-        "status": "online",
-        "health": "/api/health",
-        "changes": "/api/changes",
+        "status": "healthy",
+        "service": "ImpactLoop API",
+        "version": "0.1.0",
     }
-
