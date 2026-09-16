@@ -4,4 +4,4 @@ version = "0.1.0"
 description = "ImpactLoop Change Impact Intelligence"
 
 [tool.vercel]
-entrypoint = "backend/app/main.py"
+entrypoint = "backend.app.main:app"

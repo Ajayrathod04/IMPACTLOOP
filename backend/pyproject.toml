@@ -26,4 +26,4 @@ python_files = ["test_*.py"]
 python_functions = ["test_*"]
 
 [tool.vercel]
-entrypoint = "backend/app/main.py"
+entrypoint = "backend.app.main:app"
