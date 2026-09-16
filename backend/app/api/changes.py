@@ -3,7 +3,7 @@
 from typing import List, Optional
 from pydantic import BaseModel, Field
 from fastapi import APIRouter, HTTPException, status, Query
-from app.models.domain import (
+from ..models.domain import (
     Change, 
     ChangeStatus,
     CreateChangeRequest, 
@@ -14,7 +14,7 @@ from app.models.domain import (
     LearningRecord, 
     Scenario
 )
-from app.services.change_service import ChangeService
+from ..services.change_service import ChangeService
 
 
 class DecisionRequest(BaseModel):

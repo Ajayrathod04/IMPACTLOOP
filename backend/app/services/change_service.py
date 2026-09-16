@@ -4,8 +4,8 @@ Encapsulates business operations for changes and impact evaluations.
 """
 
 from typing import List, Optional
-from app.models.domain import Change, CreateChangeRequest
-from app.services.store import db_store
+from ..models.domain import Change, CreateChangeRequest
+from .store import db_store
 
 
 class ChangeService:

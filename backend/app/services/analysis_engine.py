@@ -6,7 +6,7 @@ downstream system consequences, surface unknowns, and recommend mitigation actio
 
 from datetime import datetime, timezone
 from typing import List, Tuple
-from app.models.domain import (
+from ..models.domain import (
     RiskLevel,
     ImpactNode,
     Action,
@@ -58,72 +58,67 @@ class LocalAnalysisEngine:
                 domain_type="Product UX",
                 depth=1,
                 confidence_score=0.85,
-                details="Users have 50% less time to reach key 'Aha!' milestone before paywall enforcement.",
+                details="Users must reach value realization within 7 days instead of 14, requiring tighter onboarding nudges.",
             ),
             ImpactNode(
                 id=f"{change_id}-node-3",
                 change_id=change_id,
-                name="Sales Qualified Lead (SQL) Pipeline",
-                domain_type="Revenue Ops",
+                name="Sales Outreach Window & Pipeline",
+                domain_type="Sales / Revenue Ops",
                 depth=2,
-                confidence_score=0.78,
-                details="Sales team outreach window compresses from 14 days to 7 days for enterprise prospects.",
+                confidence_score=0.81,
+                details="SDR team outreach window compresses from 10 days to 4 days post-signup.",
             ),
             ImpactNode(
                 id=f"{change_id}-node-4",
                 change_id=change_id,
-                name="Stripe / Subscription Gateway Webhooks",
-                domain_type="Engineering Ops",
+                name="Stripe Subscription Webhook Volume",
+                domain_type="Engineering / Billing",
                 depth=2,
-                confidence_score=0.90,
-                details="Automated trial expiration webhooks fire 7 days earlier; billing recalculations triggered.",
+                confidence_score=0.95,
+                details="Trial expiration events shift earlier, increasing automated email and webhook processing rate.",
             ),
         ]
 
         assumptions_unknowns = [
-            "User activation drop-off curve for 7-day vs 14-day duration is currently unverified.",
-            "Impact on demo request velocity for enterprise buyers has not been benchmarked.",
-            "Potential surge in billing inquiry tickets submitted to customer support.",
+            "Assumes existing onboarding email cadence can be compressed into 7 days without unsubscribes.",
+            "Unknown: Impact on enterprise trialists requiring security/legal reviews prior to purchase decision.",
+            "Assumes self-serve product activation milestone is reached within first 72 hours.",
         ]
 
         recommended_actions = [
             Action(
-                id=f"{change_id}-act-1",
+                id=f"{change_id}-action-1",
                 change_id=change_id,
-                title="Set up A/B test cohort for 10% of incoming web traffic before 100% rollout.",
-                owner="Growth Team",
-                status="pending",
-                priority="high",
-            ),
-            Action(
-                id=f"{change_id}-act-2",
-                change_id=change_id,
-                title="Deploy automated re-engagement email campaign on Day 3 of 7-day trial.",
-                owner="Lifecycle Marketing",
-                status="pending",
-                priority="high",
-            ),
-            Action(
-                id=f"{change_id}-act-3",
-                change_id=change_id,
-                title="Audit Stripe trial end webhook handlers and notification templates.",
-                owner="Engineering Ops",
+                title="Enable Automated Day-3 Activation Checkpoint Nudges",
+                owner="Product Growth Team",
                 status="pending",
                 priority="urgent",
+                reason="Ensure trialists hit core value metric before day 5 expiration.",
             ),
             Action(
-                id=f"{change_id}-act-4",
+                id=f"{change_id}-action-2",
                 change_id=change_id,
-                title="Establish daily conversion drop-off monitoring dashboard in Mixpanel.",
+                title="Establish Fast-Track Sales Extension Request Workflow",
+                owner="Sales Operations",
+                status="pending",
+                priority="high",
+                reason="Allow SDRs to extend high-value enterprise trial prospects to 14 days upon request.",
+            ),
+            Action(
+                id=f"{change_id}-action-3",
+                change_id=change_id,
+                title="Instrument 7-Day Cohort Conversion Telemetry Dashboard",
                 owner="Data Analytics",
                 status="pending",
-                priority="medium",
+                priority="high",
+                reason="Track real-world conversion rate variance vs historical 14-day baseline.",
             ),
         ]
 
         summary = (
-            f"High-impact change detected for '{req.title}'. Risk score 82/100. "
-            f"Downstream consequences identified across 4 key systems with 88% model confidence."
+            f"Reducing free trial duration from 14 days to 7 days is classified as HIGH RISK (Score: {risk_score}/100, Confidence: {confidence_score:.0%}). "
+            "While accelerating sales pipeline velocity and conversion urgency, it creates immediate pressure on onboarding time-to-value and enterprise evaluation cycles."
         )
 
         return AnalysisResult(
@@ -131,90 +126,74 @@ class LocalAnalysisEngine:
             risk_score=risk_score,
             confidence_score=confidence_score,
             affected_areas=affected_areas,
+            affected_systems=affected_areas,
             downstream_impacts=downstream_impacts,
+            impact_nodes=downstream_impacts,
             assumptions_unknowns=assumptions_unknowns,
+            unknowns=assumptions_unknowns,
             recommended_actions=recommended_actions,
+            recommendations=recommended_actions,
             summary=summary,
+            analysis_status="completed",
+            analysis_provider="deterministic_fallback",
         )
 
     @staticmethod
     def _analyze_api_infra(req: CreateChangeRequest, change_id: str) -> AnalysisResult:
         risk_level = RiskLevel.CRITICAL
         risk_score = 91
-        confidence_score = 0.92
+        confidence_score = 0.94
 
-        affected_areas = [
-            "Developer SDKs",
-            "3rd-Party Integrations",
-            "Authentication Gateway",
-            "Audit Logging",
-        ]
+        affected_areas = ["API Gateway", "Auth Microservice", "Downstream Mobile SDKs", "Database Connection Pool"]
 
         downstream_impacts = [
             ImpactNode(
                 id=f"{change_id}-node-1",
                 change_id=change_id,
-                name="Authentication Middleware Latency",
-                domain_type="Engineering",
+                name="Legacy Client Auth Session Invalidation",
+                domain_type="Engineering / Security",
                 depth=1,
-                confidence_score=0.95,
-                details="Changes to auth token validation add extra lookup overhead per API call.",
+                confidence_score=0.96,
+                details="Clients running mobile app versions < 3.4.0 will fail token renewal and be logged out.",
             ),
             ImpactNode(
                 id=f"{change_id}-node-2",
                 change_id=change_id,
-                name="3rd-Party Webhook Delivery Retries",
-                domain_type="Infrastructure",
-                depth=1,
-                confidence_score=0.88,
-                details="Partner integrations utilizing deprecated headers will fail token authentication.",
-            ),
-            ImpactNode(
-                id=f"{change_id}-node-3",
-                change_id=change_id,
-                name="Mobile & Partner SDK Token Refresh",
-                domain_type="Product",
+                name="API Rate Limiting Redis Cache Pressure",
+                domain_type="Infrastructure Ops",
                 depth=2,
-                confidence_score=0.82,
-                details="Legacy SDK versions may experience session drop-outs requiring app re-login.",
+                confidence_score=0.88,
+                details="Re-authentication spike following deployment will cause transient Redis CPU load spike.",
             ),
         ]
 
         assumptions_unknowns = [
-            "Backwards compatibility coverage for legacy client SDK v1.x is unverified.",
-            "Token refresh rate during peak traffic spikes has not been load tested.",
+            "Assumes all partner integrations have updated to OAuth v2 bearer token spec.",
+            "Unknown: Third-party webhooks retry count during 10-minute migration deployment window.",
         ]
 
         recommended_actions = [
             Action(
-                id=f"{change_id}-act-1",
+                id=f"{change_id}-action-1",
                 change_id=change_id,
-                title="Publish HTTP Sunset headers and send deprecation email 30 days prior.",
-                owner="DevRel",
+                title="Deploy Dual-Write Token Migration Compatibility Layer for 14 Days",
+                owner="Core Platform Eng",
                 status="pending",
                 priority="urgent",
             ),
             Action(
-                id=f"{change_id}-act-2",
+                id=f"{change_id}-action-2",
                 change_id=change_id,
-                title="Execute shadow traffic load testing against auth gateway endpoints.",
-                owner="Platform Infra",
+                title="Pre-warm Redis Auth Cache Cluster 1 Hour Prior to Deployment",
+                owner="DevOps / SRE",
                 status="pending",
                 priority="high",
-            ),
-            Action(
-                id=f"{change_id}-act-3",
-                change_id=change_id,
-                title="Update official TypeScript & Python client SDK repositories.",
-                owner="Core SDK Team",
-                status="pending",
-                priority="medium",
             ),
         ]
 
         summary = (
-            f"Critical API/Infrastructure change detected for '{req.title}'. Risk score 91/100. "
-            f"Requires mandatory deprecation window and load testing."
+            f"Infrastructure / API Change '{req.title}' is classified as CRITICAL RISK (Score: {risk_score}/100). "
+            "Requires explicit zero-downtime migration guardrails and partner notification period prior to release."
         )
 
         return AnalysisResult(
@@ -222,67 +201,57 @@ class LocalAnalysisEngine:
             risk_score=risk_score,
             confidence_score=confidence_score,
             affected_areas=affected_areas,
+            affected_systems=affected_areas,
             downstream_impacts=downstream_impacts,
+            impact_nodes=downstream_impacts,
             assumptions_unknowns=assumptions_unknowns,
+            unknowns=assumptions_unknowns,
             recommended_actions=recommended_actions,
+            recommendations=recommended_actions,
             summary=summary,
+            analysis_status="completed",
+            analysis_provider="deterministic_fallback",
         )
 
     @staticmethod
     def _analyze_generic_product(req: CreateChangeRequest, change_id: str) -> AnalysisResult:
         risk_level = RiskLevel.MEDIUM
-        risk_score = 64
-        confidence_score = 0.81
+        risk_score = 55
+        confidence_score = 0.80
 
-        affected_areas = ["User Experience", "Product Telemetry", "Feature Flags", "Customer Support"]
+        affected_areas = ["Product UX", "User Engagement", "Customer Support Volume"]
 
         downstream_impacts = [
             ImpactNode(
                 id=f"{change_id}-node-1",
                 change_id=change_id,
-                name="Primary User Workflow Completion",
+                name="User Navigation Flow Adaptation",
                 domain_type="Product UX",
                 depth=1,
-                confidence_score=0.84,
-                details="Changes to workflow steps may alter task completion rate.",
-            ),
-            ImpactNode(
-                id=f"{change_id}-node-2",
-                change_id=change_id,
-                name="Customer Support Inquiry Volume",
-                domain_type="Ops",
-                depth=2,
-                confidence_score=0.76,
-                details="New UI flows typically create transient spike in user clarification tickets.",
+                confidence_score=0.82,
+                details="Minor friction expected as existing active users adapt to updated UI layout.",
             ),
         ]
 
         assumptions_unknowns = [
-            "User friction for modified workflow layout has not been usability tested.",
+            "Assumes feature flag rollout enabled for 10% canary group first.",
+            "Unknown: Support ticket volume impact during first 48 hours post-release.",
         ]
 
         recommended_actions = [
             Action(
-                id=f"{change_id}-act-1",
+                id=f"{change_id}-action-1",
                 change_id=change_id,
-                title="Wrap feature in dark launch flag for staged internal team testing.",
-                owner="Release Engineering",
+                title="Enable 10% Canary Feature Flag Rollout Strategy",
+                owner="Product Operations",
                 status="pending",
                 priority="high",
-            ),
-            Action(
-                id=f"{change_id}-act-2",
-                change_id=change_id,
-                title="Configure error telemetry alerts for new UI component event loops.",
-                owner="Frontend Eng",
-                status="pending",
-                priority="medium",
             ),
         ]
 
         summary = (
-            f"Moderate risk change detected for '{req.title}'. Risk score 64/100. "
-            f"Recommended for canary rollout under feature flag control."
+            f"Product feature change '{req.title}' is classified as MEDIUM RISK (Score: {risk_score}/100). "
+            "Standard canary deployment and support documentation preparation recommended."
         )
 
         return AnalysisResult(
@@ -290,8 +259,14 @@ class LocalAnalysisEngine:
             risk_score=risk_score,
             confidence_score=confidence_score,
             affected_areas=affected_areas,
+            affected_systems=affected_areas,
             downstream_impacts=downstream_impacts,
+            impact_nodes=downstream_impacts,
             assumptions_unknowns=assumptions_unknowns,
+            unknowns=assumptions_unknowns,
             recommended_actions=recommended_actions,
+            recommendations=recommended_actions,
             summary=summary,
+            analysis_status="completed",
+            analysis_provider="deterministic_fallback",
         )

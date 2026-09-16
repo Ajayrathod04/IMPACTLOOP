@@ -9,8 +9,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
-from app.api.health import router as health_router
-from app.api.changes import router as changes_router
+from .api.health import router as health_router
+from .api.changes import router as changes_router
 
 app = FastAPI(
     title="ImpactLoop API",
@@ -19,13 +19,6 @@ app = FastAPI(
 )
 
 # Configure CORS origins for local & production hosting
-origins = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "http://localhost:3000",
-    "*"
-]
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -42,6 +35,7 @@ app.include_router(changes_router)
 
 
 @app.get("/")
+@app.get("/api")
 async def root():
     """Root endpoint delivering basic API metadata."""
     return {
