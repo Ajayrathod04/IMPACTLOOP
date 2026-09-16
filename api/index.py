@@ -35,6 +35,8 @@ app.include_router(changes_router)
 
 @app.get("/")
 @app.get("/api")
+@app.get("/api/index")
+@app.get("/api/index.py")
 async def root():
     return {
         "name": "ImpactLoop API",
