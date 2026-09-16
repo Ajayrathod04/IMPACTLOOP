@@ -2,16 +2,26 @@
 
 import sys
 import os
+
+# Ensure api directory, app directory, root directory, and backend directory are all on sys.path
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.abspath(os.path.join(current_dir, ".."))
+backend_dir = os.path.abspath(os.path.join(parent_dir, "backend"))
+app_dir = os.path.join(current_dir, "app")
+
+for path in [current_dir, app_dir, parent_dir, backend_dir]:
+    if os.path.exists(path) and path not in sys.path:
+        sys.path.insert(0, path)
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# Ensure api directory is in sys.path
-api_dir = os.path.dirname(os.path.abspath(__file__))
-if api_dir not in sys.path:
-    sys.path.insert(0, api_dir)
-
-from app.api.health import router as health_router
-from app.api.changes import router as changes_router
+try:
+    from app.api.health import router as health_router
+    from app.api.changes import router as changes_router
+except ImportError:
+    from api.health import router as health_router
+    from api.changes import router as changes_router
 
 app = FastAPI(
     title="ImpactLoop API",
@@ -44,3 +54,4 @@ async def root():
         "health": "/api/health",
         "changes": "/api/changes",
     }
+
