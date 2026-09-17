@@ -1,455 +1,617 @@
-# IMPACTLOOP — Project README / Hackathon Handoff
+# 🔁 ImpactLoop — AI Change-Impact Decision Intelligence
 
-Project
-Name: ImpactLoop
-Tagline: AI Change-Impact Decision Intelligence
-Core message: See what your change sets in motion.
+> **See what your change sets in motion.**
+>
+> ImpactLoop is a decision-intelligence prototype for SaaS, product, and engineering teams. It helps a team understand the downstream consequences of a proposed change before shipping, connect those consequences to evidence, make uncertainty explicit, and place a human decision gate before release.
 
-ImpactLoop is a decision-intelligence product for consequential SaaS, product, and engineering changes. It traces downstream consequences, makes evidence and uncertainty inspectable, supports scenario analysis, keeps the final release decision human-controlled, and closes the loop by comparing outcomes and storing organizational memory.
+---
 
-IMPORTANT CURRENT DEPLOYMENT STATUS
-Verified working public UI:
-[https://frontend-orpin-one-42.vercel.app/](https://frontend-orpin-one-42.vercel.app/)
+## 🚀 Live Project
 
-Also deployed:
-[https://frontend-raog0z1qa-ajayrofficiall-3809s-projects.vercel.app/](https://frontend-raog0z1qa-ajayrofficiall-3809s-projects.vercel.app/)
+| Resource | Link |
+|---|---|
+| 🌐 **Live frontend / demo** | https://frontend-orpin-one-42.vercel.app/ |
+| 🌐 **Additional Vercel deployment** | https://frontend-raog0z1qa-ajayrofficiall-3809s-projects.vercel.app/ |
+| 🔗 **Project repository** | https://github.com/Ajayrathod04/IMPACTLOOP |
+| 🏠 **Root Vercel deployment** | https://impactloop-eight.vercel.app/ |
 
-The root/API deployment:
-[https://impactloop-eight.vercel.app/](https://impactloop-eight.vercel.app/)
-currently responds at its root with {"detail":"Not Found"} rather than the ImpactLoop UI. Do NOT use this URL as the primary demo UI unless it is separately fixed.
+> **Recommended demo URL:** `https://frontend-orpin-one-42.vercel.app/`
+>
+> The root Vercel deployment is the backend/API-oriented deployment and may show `{"detail":"Not Found"}` at `/` when opened directly. Use the frontend URL for the product demonstration.
 
-The final public UI used for the demo/submission should therefore be:
-[https://frontend-orpin-one-42.vercel.app/](https://frontend-orpin-one-42.vercel.app/)
+---
 
-GitHub:
-The repository URL was not available/verified from the project source material available while preparing this document. Do not invent a GitHub URL. Add the actual public repository URL here if required:
-[PASTE VERIFIED GITHUB REPOSITORY URL HERE]
+## 🎯 Problem
 
-## 1. Problem Statement
-A small product or engineering change can create a large decision surface.
+Modern SaaS changes rarely affect only the screen or service being edited.
 
-A change rarely stops at the team that owns it. Its consequences can spread across revenue, support, onboarding, billing, customer success, operations, and other connected systems.
+A seemingly small change can propagate through:
 
-The core problems are:
-## 1. Hidden Dependencies — Downstream Impact Is Distributed Across Systems.
-## 2. Fragmented Evidence — Decision-Makers Need Provenance, Confidence, And Context.
-## 3. Unknowns — Unverified Assumptions Should Be Visible Before Release.
-## 4. Lost Learning — Post-Ship Outcomes Should Feed The Next Decision.
+- product workflows
+- APIs and services
+- data dependencies
+- customer-facing surfaces
+- operational processes
+- release timelines
+- downstream systems
 
-Example change used in the demo:
-"Change free trial from 14 days to 7 days."
+The difficult question is not simply:
 
-## 2. Solution
-ImpactLoop turns a change request into a traceable decision loop.
+> **"Can we make this change?"**
 
-It provides:
-- Downstream impact mapping
-- Interactive impact/dependency graph
-- Evidence with provenance and confidence
-- Explicit unknowns and validation paths
-- Expected/adverse scenario views
-- Human decision gate and release guardrails
-- Ship/observe/learn workflow
-- Organizational memory
-- Repeatable change intake
+It is:
 
-Core principle:
-AI analyzes -> humans decide -> outcomes become organizational memory.
+> **"What else will this change affect, what evidence supports that conclusion, what remains unknown, and should we ship it?"**
 
-## 3. Product Workflow
-PREDICT -> PROVE -> STRESS-TEST -> DECIDE -> SHIP -> OBSERVE -> LEARN
+Traditional change reviews often depend on scattered documentation, manual dependency tracing, and individual memory. This creates blind spots and makes important decisions difficult to reproduce.
 
-Detailed flow:
-CHANGE INPUT
-    |
-    v
-IMPACT GRAPH
-    |
-    v
-EVIDENCE + UNKNOWNS
-    |
-    v
-SCENARIOS
-    |
-    v
-HUMAN DECISION GATE
-    |
-    v
-SHIP + TELEMETRY
-    |
-    v
-ORGANIZATIONAL MEMORY
-    |
-    +----> informs future decisions
+---
 
-## 4. What The Ui Shows
-Landing / Impact Observatory:
-- ImpactLoop identity
-- "See what your change sets in motion."
-- Decision-intelligence positioning
-- Interactive spatial impact visualization
+## 💡 Solution
 
-Impact graph:
-- Change core
-- Connected downstream systems
-- Severity/risk signals
-- Relationship/propagation view
-- Example: 14 days -> 7 days
-- Affected areas include revenue, support, onboarding, billing, and success
+**ImpactLoop turns a proposed change into an observable decision workflow.**
 
-Evidence:
-- Verified source records
-- Confidence signals
-- Provenance
-- Affected node/context
-- The reasoning behind a decision is inspectable rather than appearing as an unexplained score
+The system is designed around five ideas:
 
-Unknowns:
-- Unverified assumptions are explicitly visible
-- Unknowns have a validation/resolution path
-- Known vs unknown information is separated
+1. 🔎 **Map impact** — identify downstream systems and surfaces affected by a proposed change.
+2. 🕸️ **Visualize propagation** — show relationships as an impact graph instead of a flat checklist.
+3. 📚 **Ground decisions in evidence** — connect conclusions to verified evidence and make unknowns explicit.
+4. 🧑‍⚖️ **Keep humans in control** — present a clear decision gate before release.
+5. 🔄 **Learn from outcomes** — preserve the decision/evidence trail so future changes can be reviewed with organizational context.
 
-Scenarios:
-- Expected scenario
-- Adverse scenario
-- Stress-testing of assumptions
-- Scenario results feed the human decision gate
+---
 
-Human decision:
-- Risk breadth, severity, and uncertainty are visible together
-- Guardrails can be used as release conditions
-- The final decision remains human-controlled
+# 🧭 Product Flow
 
-Close the loop:
-- Ship the approved change
-- Observe predicted vs actual outcomes/telemetry
-- Learn from outcomes
-- Store reusable organizational memory
+```text
+┌──────────────────────┐
+│  1. PROPOSE CHANGE   │
+│  What is changing?   │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│  2. MAP IMPACT       │
+│  Find downstream     │
+│  systems & surfaces  │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│  3. REPLAY IMPACT    │
+│  Explore propagation │
+│  through the graph   │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│  4. VERIFY EVIDENCE  │
+│  Evidence + unknowns │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│  5. DECISION GATE    │
+│ Approve / Review /   │
+│ Hold                 │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│  6. SHIP & OBSERVE   │
+│  Record outcome and  │
+│  learn for next time │
+└──────────────────────┘
+```
 
-Repeatability:
-- New change intake captures the baseline, proposed state, target metric, and owner
-- The same decision loop can be reused for another change
+---
 
-## 5. Demo Example
+# 🏗️ Architecture
+
+ImpactLoop is structured as a web application with a React/Vite frontend and a Python/FastAPI backend.
+
+```text
+                         ┌─────────────────────────┐
+                         │        USER             │
+                         │ Product / Eng / SaaS    │
+                         └────────────┬────────────┘
+                                      │
+                                      ▼
+                    ┌─────────────────────────────────┐
+                    │       React + Vite Frontend     │
+                    │                                 │
+                    │  • Impact visualization         │
+                    │  • Change analysis UI           │
+                    │  • Evidence / decision UI       │
+                    │  • Demo workflow                 │
+                    └───────────────┬─────────────────┘
+                                    │ HTTP / API
+                                    ▼
+                    ┌─────────────────────────────────┐
+                    │        FastAPI Backend           │
+                    │                                 │
+                    │  • API endpoints                 │
+                    │  • Change-impact logic           │
+                    │  • Decision workflow             │
+                    │  • Evidence / result models      │
+                    └───────────────┬─────────────────┘
+                                    │
+                                    ▼
+                    ┌─────────────────────────────────┐
+                    │       Impact Intelligence        │
+                    │                                 │
+                    │  Change → Relationships →       │
+                    │  Impact → Evidence → Decision   │
+                    └─────────────────────────────────┘
+```
+
+### Repository structure
+
+```text
+IMPACTLOOP/
+├── api/                    # Vercel API entrypoint
+├── backend/                # FastAPI backend
+│   └── app/
+├── frontend/               # React + Vite application
+├── demo/                   # Demo material / product walkthrough
+├── docs/                   # Documentation
+├── infra/                  # Infrastructure / deployment material
+├── submission/
+│   └── screenshots/        # Competition screenshots
+├── package.json
+├── pyproject.toml
+├── requirements.txt
+├── runtime.txt
+├── vercel.json
+└── README.md
+```
+
+---
+
+# 🖥️ What the UI Shows
+
+## 1. Landing / Product Positioning
+
+The landing screen introduces ImpactLoop as an **AI Change-Impact Decision Intelligence** system.
+
+The primary message is:
+
+> **SEE WHAT YOUR CHANGE SETS IN MOTION.**
+
+The visual centerpiece represents the change-impact graph and downstream propagation.
+
+The user can enter the product through:
+
+- **Explore the Impact**
+- **Analyze a Change**
+
+---
+
+## 2. Spatial Impact Graph
+
+The impact graph turns a proposed change into a visual network.
+
+It communicates:
+
+```text
+Change
+  │
+  ├──► System A
+  │      ├──► Surface A1
+  │      └──► Surface A2
+  │
+  ├──► System B
+  │
+  └──► System C
+          └──► Customer-facing surface
+```
+
+Instead of reading a long dependency list, a reviewer can visually understand how the change propagates.
+
+---
+
+## 3. Impact Replay
+
+The replay view makes propagation observable.
+
+The graph animation demonstrates that a change is not an isolated edit — it can travel through connected systems and surfaces.
+
+This makes the concept easier to inspect during a decision review.
+
+---
+
+## 4. Predict → Prove → Decide
+
+ImpactLoop separates three important stages:
+
+```text
+PREDICT
+   ↓
+What could be affected?
+
+PROVE
+   ↓
+What evidence supports the impact?
+
+DECIDE
+   ↓
+What should the team do before release?
+```
+
+The decision stage keeps a human in control instead of treating an automated prediction as an unquestionable release decision.
+
+---
+
+## 5. Decision Gate
+
+The workflow presents explicit actions such as:
+
+```text
+┌──────────────┐
+│   APPROVE    │
+└──────────────┘
+
+┌──────────────┐
+│    REVIEW    │
+└──────────────┘
+
+┌──────────────┐
+│     HOLD     │
+└──────────────┘
+```
+
+This makes the product useful as a release-review mechanism rather than only as an analytics screen.
+
+---
+
+## 6. Evidence → Organizational Memory
+
+A decision should not disappear after the release.
+
+ImpactLoop's concept is to preserve:
+
+```text
+Evidence
+   ↓
+Decision
+   ↓
+Release
+   ↓
+Observed outcome
+   ↓
+Organizational memory
+   ↓
+Better future decisions
+```
+
+This creates the **ImpactLoop**: decisions become reusable context instead of isolated one-time reviews.
+
+---
+
+# 📊 Example Outcome
+
+For a change such as:
+
+```text
 Change:
-Free trial duration: 14 days -> 7 days
+14-day trial → 7-day trial
+```
 
-ImpactLoop demonstrates:
-- What downstream systems may be affected
-- Which areas have stronger risk signals
-- What evidence supports the analysis
-- What remains uncertain
-- How expected and adverse scenarios differ
-- What guardrails should be considered
-- Where a human makes the release decision
-- How post-release outcomes can become organizational memory
+ImpactLoop can present the change as an impact-analysis problem rather than simply a UI edit.
 
-## 6. Output / Outcome
-Primary output:
-A traceable change-impact decision record rather than a single opaque AI answer.
+The reviewer can inspect:
 
-The output exposes:
-- Change being evaluated
-- Impact/dependency graph
-- Affected systems
-- Evidence
-- Confidence
-- Provenance
-- Unknowns
-- Scenario outcomes
-- Risk/guardrail information
-- Human decision point
-- Release/observation/learning path
+```text
+Trial policy change
+        │
+        ├──► Signup / onboarding
+        ├──► Billing / conversion logic
+        ├──► Product messaging
+        ├──► Customer lifecycle
+        └──► Analytics / reporting
+```
 
-Expected product outcome:
-A team can understand the decision surface of a consequential change before shipping, see the basis and uncertainty behind the analysis, make the release decision deliberately, and reuse the resulting knowledge later.
+The important outcome is a **structured decision view**:
 
-## 7. Advantages
-Compared with a normal ticket/dashboard workflow, ImpactLoop is designed to:
-- Make downstream impact visible instead of isolated
-- Make evidence inspectable instead of opaque
-- Treat uncertainty as a first-class object
-- Connect analysis to an explicit human release gate
-- Connect release to observation and learning
-- Preserve organizational memory
-- Present the workflow spatially through an interactive impact graph
-- Keep the product focused on decisions, not just analytics
+```text
+PROPOSED CHANGE
+      ↓
+DOWNSTREAM IMPACTS
+      ↓
+EVIDENCE + UNKNOWNS
+      ↓
+HUMAN DECISION
+      ↓
+RELEASE
+      ↓
+LEARN
+```
 
-## 8. Architecture
-Current intended architecture:
+---
 
-    +-----------------------------+
-    |       IMPACTLOOP UI         |
-    | React + TypeScript + Vite   |
-    | Tailwind + React Flow       |
-    | Lucide React                |
-    +-------------+---------------+
-    |
-    | /api/*
-    v
-    +-----------------------------+
-    |          FASTAPI            |
-    | Python 3.12 + Pydantic      |
-    | API / domain services       |
-    +-------------+---------------+
-    |
-    v
-    +-----------------------------+
-    |   DETERMINISTIC ANALYSIS    |
-    | change / graph / evidence   |
-    | scenarios / decision flow   |
-    +-------------+---------------+
-    |
-    v
-    +-----------------------------+
-    | FUTURE AGENT LAYER          |
-    | Strands / Bedrock direction |
-    +-----------------------------+
+# ✨ Key Advantages
 
-Visual layer:
-Interactive spatial/WebGL-style visualization and React Flow consequence mapping.
+### 🔎 Impact visibility
+Makes downstream consequences easier to see before release.
 
-Architecture principle:
-Frontend -> FastAPI -> analysis/domain layer -> future agent layer.
+### 🧠 Decision intelligence
+Moves the workflow beyond simple dependency visualization toward an explicit decision process.
 
-The project source specifically preserves:
-- React + TypeScript architecture
-- FastAPI backend
-- Pydantic models
-- Deterministic analysis engine
-- React Flow as a central impact-graph component
+### 📚 Evidence-aware
+Separates supported conclusions from areas where information is still unknown.
 
-## 9. Technology Stack
-Frontend:
-- React
-- TypeScript
-- Vite
-- Tailwind CSS
-- React Flow
-- Lucide React
+### 🧑‍⚖️ Human-in-the-loop
+The system supports the decision; the human remains the final decision-maker.
 
-Backend:
-- Python 3.12
-- FastAPI
-- Pydantic
-- uv
+### 🔄 Continuous learning
+Decisions and outcomes can become organizational memory for future changes.
 
-Development / verification:
-- npm
-- Vite production build
-- pytest
-- PowerShell / Windows
-- Ubuntu 26.04 LTS via WSL2 was used during development/testing
+### 🕸️ Visual reasoning
+A graph and replay model make complex propagation easier to understand than a flat list.
 
-Deployment:
-- Vercel
-- Vercel CLI
+### ⚡ Faster change review
+A structured workflow can reduce the manual effort required to reason through a change.
 
-## 10. Verified Development Results
-Backend tests:
-python -m pytest backend/tests
-Result: 7 passed
+---
 
-Frontend production build:
-npm run build
-Result: successful, 0 TypeScript/build errors
-Recorded build: 45 modules transformed, built successfully.
+# 🛠️ Technology Stack
 
-API verification performed during local development:
-GET /api/health -> HTTP 200 OK
-GET /api/changes -> verified
-GET /api/changes/{id} -> verified
-POST /api/changes -> verified
-POST /api/changes/{id}/analyze -> verified
+| Layer | Technology | Role |
+|---|---|---|
+| 🎨 Frontend | React | Product UI |
+| ⚡ Build tool | Vite | Frontend development/build |
+| 🎨 Styling | Tailwind CSS | UI styling |
+| 🐍 Backend | Python | Application/backend logic |
+| 🚀 API | FastAPI | HTTP API |
+| 📋 Validation | Pydantic | Data/request models |
+| ☁️ Deployment | Vercel | Web deployment |
+| 🔀 Source control | Git + GitHub | Version control |
+| 🧪 Testing | Pytest | Backend validation |
 
-Local integrated preview:
-http://localhost:5173/
+---
 
-Local backend:
-http://127.0.0.1:8000
+# 🔧 Development Setup
 
-Local API proxy:
-Frontend /api/* -> http://127.0.0.1:8000
+## Prerequisites
 
-## 11. Production Deployment Notes
-Successful Vercel CLI authentication was established.
+```bash
+Node.js
+npm
+Python 3.12+
+Git
+```
 
-Successful command used for a forced production deployment:
-vercel --prod --yes --force
+## Clone
 
-A direct frontend deployment was also created from:
-frontend/
+```bash
+git clone https://github.com/Ajayrathod04/IMPACTLOOP.git
+cd IMPACTLOOP
+```
 
-The working public frontend URL currently verified visually:
-[https://frontend-orpin-one-42.vercel.app/](https://frontend-orpin-one-42.vercel.app/)
+## Frontend
 
-Another Vercel frontend deployment:
-[https://frontend-raog0z1qa-ajayrofficiall-3809s-projects.vercel.app/](https://frontend-raog0z1qa-ajayrofficiall-3809s-projects.vercel.app/)
-
-The root deployment:
-[https://impactloop-eight.vercel.app/](https://impactloop-eight.vercel.app/)
-is not currently the correct public UI endpoint because its root returned:
-{"detail":"Not Found"}
-
-Do not describe the root endpoint as the working frontend unless it is fixed and re-verified.
-
-## 12. Important Deployment Configuration Note
-The repository previously used a root Vercel configuration intended to:
-- build frontend with npm --prefix frontend run build
-- serve frontend/dist
-- route /api/* to api/index.py
-
-The API entrypoint was:
-from backend.app.main import app
-
-The project also contains:
-api/requirements.txt
-
-Dependencies recorded:
-fastapi==0.110.0
-pydantic==2.6.4
-starlette==0.36.3
-typing_extensions==4.10.0
-httpx==0.27.0
-anyio==4.3.0
-aiofiles==23.2.1
-
-## 13. Recommended Local Commands
-From repository root:
-
-Start frontend:
-cd "D:\program files\IMPACTLOOP\frontend"
+```bash
+cd frontend
+npm install
 npm run dev
+```
 
-Frontend local URL:
-http://localhost:5173/
+The Vite development server will provide the local frontend URL.
 
-Backend (when required):
-python -m uvicorn app.main:app --reload --port 8000
+## Backend
 
-Backend tests:
-python -m pytest backend/tests
+From the repository root:
 
-Frontend production build:
+```bash
+python -m venv .venv
+```
+
+### Windows PowerShell
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+uvicorn backend.app.main:app --reload
+```
+
+### Linux / WSL
+
+```bash
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn backend.app.main:app --reload
+```
+
+---
+
+# 🧪 Testing
+
+Run backend tests with:
+
+```bash
+pytest
+```
+
+For the frontend:
+
+```bash
 cd frontend
 npm run build
+```
 
-Vercel production deployment:
-cd "D:\program files\IMPACTLOOP"
+A successful production build should generate:
+
+```text
+frontend/dist/
+```
+
+---
+
+# ☁️ Deployment
+
+## Frontend deployment
+
+From the repository root:
+
+```powershell
+vercel frontend --prod --yes --force
+```
+
+## Root deployment
+
+```powershell
 vercel --prod --yes --force
+```
 
-Vercel authentication check:
-vercel whoami
+> The frontend deployment is the URL intended for judges/users to open the ImpactLoop interface.
 
-Vercel production logs:
-vercel logs https://impactloop-aa2d.vercel.app --since 2h
+---
 
-## 14. Hackathon Demo Story
-Opening:
-"ImpactLoop is AI change-impact decision intelligence. It helps teams see what a change sets in motion before they ship it."
+# 🔗 Public Links
 
-Problem:
-"A small change can create a large decision surface. Dependencies are hidden, evidence is fragmented, unknowns are easy to miss, and learning gets lost after release."
+### 🌐 Live Demo
 
-Solution:
-"ImpactLoop turns one change into a traceable decision loop: predict, prove, stress-test, decide, ship, observe, and learn."
+https://frontend-orpin-one-42.vercel.app/
 
-Demo sequence:
-## 1. Landing — Establish The Problem.
-## 2. Impact Graph — Show Downstream Systems And Severity.
-## 3. Evidence — Show Verified Sources, Confidence, And Provenance.
-## 4. Unknowns — Show What Is Not Yet Verified.
-## 5. Scenarios — Compare Expected And Adverse Outcomes.
-## 6. Human Decision Gate — Show Risk And Guardrails.
-## 7. Close Loop — Show Ship, Observe, And Learn.
-## 8. Repeat — Enter Another Change.
+### 🌐 Alternate Frontend Deployment
 
-Core closing line:
-"AI analyzes. Humans decide. Outcomes become organizational memory."
+https://frontend-raog0z1qa-ajayrofficiall-3809s-projects.vercel.app/
 
-## 15. Video / Youtube
-Recommended YouTube title:
-ImpactLoop — AI Change-Impact Decision Intelligence | Hackathon Demo
+### 💻 GitHub
 
-Alternative:
-ImpactLoop | See What Your Change Sets in Motion | Hackathon Demo
+https://github.com/Ajayrathod04/IMPACTLOOP
 
-Recommended filename:
-ImpactLoop_AI_Change_Impact_Decision_Intelligence_Hackathon_Demo.mp4
+### ☁️ Root Vercel Deployment
 
-Suggested YouTube description:
-ImpactLoop is an AI change-impact decision intelligence product that traces downstream consequences, makes evidence and uncertainty inspectable, supports scenario stress-testing, keeps the final release decision human-controlled, and closes the loop through observation and organizational memory.
+https://impactloop-eight.vercel.app/
 
-Live demo:
-[https://frontend-orpin-one-42.vercel.app/](https://frontend-orpin-one-42.vercel.app/)
+---
 
-## 16. Google Vids Voiceover Speed Note
-Google Vids currently does not provide a normal numeric playback-speed control for an already generated AI voiceover.
+# 🎥 Competition Demo Flow
 
-For AI voiceovers, Google documents an audio-tag workflow:
-- Open Voiceover.
-- Edit the scene script.
-- Type "[" to open the audio-tag/modifier menu.
-- Choose the pace modifier available in the menu.
-- Regenerate/replace the voiceover.
+A concise judge-facing walkthrough:
 
-If the generated voiceover is already too fast, the practical workaround is to regenerate with a slower pace modifier and add punctuation/pauses where needed.
+```text
+01  LANDING
+    ↓
+02  SHOW IMPACT GRAPH
+    ↓
+03  REPLAY PROPAGATION
+    ↓
+04  PREDICT → PROVE → DECIDE
+    ↓
+05  APPROVE / REVIEW / HOLD
+    ↓
+06  EVIDENCE → ORGANIZATIONAL MEMORY
+    ↓
+07  ANALYZE A NEW CHANGE
+```
 
-Important:
-The Vids teleprompter "Speed" slider controls how the script scrolls while recording; it is not the same thing as changing the generated AI voiceover's speech rate.
+### Recommended example
 
-## 17. What Not To Claim
-Do not claim:
-- A fully autonomous AI agent is already deployed if it is not.
-- The root Vercel URL is the working UI when it returns Not Found.
-- A specific GitHub repository URL unless verified.
-- Production backend/API integration is live unless the endpoint has been re-tested.
-- Predictions are real-world guarantees.
-- ImpactLoop replaces human release accountability.
+Use:
 
-Use accurate language:
-- "decision intelligence"
-- "impact analysis"
-- "evidence and uncertainty"
-- "scenario stress-testing"
-- "human decision gate"
-- "closed-loop learning"
-- "deterministic analysis engine" where applicable
-- "future agent layer" for planned Strands/Bedrock integration
+```text
+14-day trial → 7-day trial
+```
 
-## 18. Judge-Facing Value
-ImpactLoop is positioned around a simple question:
+Then show how the change is analyzed across downstream systems and surfaces.
 
-"What happens if we make this change?"
+---
 
-Instead of returning only an AI answer, the product makes the decision surface visible:
-CHANGE -> CONSEQUENCES -> EVIDENCE -> UNKNOWNS -> SCENARIOS -> HUMAN DECISION -> OUTCOME -> MEMORY
+# 🧩 Core Product Concept
 
-The strongest differentiators demonstrated by the product are:
-- consequence mapping
-- inspectable evidence
-- explicit uncertainty
-- scenario comparison
-- human-controlled release gate
-- closed-loop organizational learning
-- spatial/interactive presentation
+ImpactLoop is built around a simple principle:
 
-## 19. Links
-PRIMARY LIVE DEMO:
-[https://frontend-orpin-one-42.vercel.app/](https://frontend-orpin-one-42.vercel.app/)
+> **A change is not complete when it is implemented. It is complete when its consequences are understood, its evidence is visible, the decision is explicit, and the outcome can be learned from.**
 
-SECONDARY FRONTEND DEPLOYMENT:
-[https://frontend-raog0z1qa-ajayrofficiall-3809s-projects.vercel.app/](https://frontend-raog0z1qa-ajayrofficiall-3809s-projects.vercel.app/)
+The product therefore closes the loop:
 
-ROOT VERCEL DEPLOYMENT (CURRENTLY NOT THE UI):
-[https://impactloop-eight.vercel.app/](https://impactloop-eight.vercel.app/)
+```text
+┌────────────┐
+│   CHANGE   │
+└─────┬──────┘
+      ↓
+┌────────────┐
+│   IMPACT   │
+└─────┬──────┘
+      ↓
+┌────────────┐
+│  EVIDENCE  │
+└─────┬──────┘
+      ↓
+┌────────────┐
+│  DECISION  │
+└─────┬──────┘
+      ↓
+┌────────────┐
+│   SHIP     │
+└─────┬──────┘
+      ↓
+┌────────────┐
+│  OUTCOME   │
+└─────┬──────┘
+      │
+      └──────────────► ORGANIZATIONAL MEMORY
+                              │
+                              └──► future decisions
+```
 
-GITHUB:
-[[ADD VERIFIED PUBLIC GITHUB URL]](https://github.com/Ajayrathod04/IMPACTLOOP/)
+---
 
-LOCAL:
-http://localhost:5173/
-http://127.0.0.1:8000/
+# 📁 Project Documentation
 
-## 20. Final One-Line Description
-ImpactLoop is an AI change-impact decision intelligence system that maps downstream consequences, proves the basis with evidence, surfaces uncertainty, stress-tests scenarios, keeps release decisions human-controlled, and learns from outcomes.
+Relevant repository areas:
+
+```text
+docs/
+demo/
+submission/screenshots/
+frontend/
+backend/
+api/
+infra/
+```
+
+---
+
+# 🏆 What Was Built
+
+ImpactLoop delivers a competition-ready prototype demonstrating:
+
+- ✅ AI change-impact decision intelligence concept
+- ✅ Interactive product landing experience
+- ✅ Spatial impact visualization
+- ✅ Impact replay concept
+- ✅ Predict → Prove → Decide workflow
+- ✅ Evidence-aware decision framing
+- ✅ Human decision gate
+- ✅ Organizational-memory concept
+- ✅ Change-analysis workflow
+- ✅ React/Vite frontend
+- ✅ FastAPI backend
+- ✅ Production deployment through Vercel
+- ✅ Public GitHub repository
+- ✅ Judge-facing live demonstration
+
+---
+
+# 👤 Project
+
+**ImpactLoop**
+
+AI Change-Impact Decision Intelligence
+
+Built by **Ajay Rathod**
+
+GitHub:  
+https://github.com/Ajayrathod04/IMPACTLOOP
+
+Live Demo:  
+https://frontend-orpin-one-42.vercel.app/
+
+---
+
+## 📜 License
+
+See the repository `LICENSE` file for the project's license terms.
